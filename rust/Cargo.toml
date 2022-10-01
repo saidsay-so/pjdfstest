@@ -1,5 +1,5 @@
 [package]
-name = "pjdfs_tests"
+name = "pjdfstest"
 version = "0.1.0"
 edition = "2021"
 
@@ -23,3 +23,8 @@ walkdir = "2.3.2"
 [[bin]]
 name = "pjdfstest"
 path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

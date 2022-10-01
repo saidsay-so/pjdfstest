@@ -1,8 +1,4 @@
-use nix::{
-    errno::Errno,
-    sys::stat::{fstat, lstat},
-    unistd::unlink,
-};
+use nix::{sys::stat::fstat, unistd::unlink};
 
 use crate::{
     runner::context::{FileType, SerializedTestContext, TestContext},
@@ -10,7 +6,7 @@ use crate::{
     utils::link,
 };
 
-use super::{assert_mtime_changed, errors::enotdir::enotdir_comp_test_case};
+use super::{assert_times_changed, errors::enotdir::enotdir_comp_test_case, CTIME, MTIME};
 
 crate::test_case! {
     /// unlink removes regular, block and char files, symbolic links, fifos and sockets
@@ -32,7 +28,7 @@ crate::test_case! {
 fn update_ctime_success(ctx: &mut TestContext, ft: FileType) {
     let path = ctx.create(ft).unwrap();
 
-    let link_path = ctx.base_path().join("link");
+    let link_path = ctx.gen_path();
     link(&path, &link_path).unwrap();
 
     assert_ctime_changed(ctx, &link_path, || {
@@ -62,7 +58,7 @@ crate::test_case! {
 fn unchanged_ctime_failed(ctx: &mut SerializedTestContext, ft: FileType) {
     let path = ctx.create(ft).unwrap();
 
-    let link_path = ctx.base_path().join("link");
+    let link_path = ctx.gen_path();
     link(&path, &link_path).unwrap();
 
     let user = ctx.get_new_user();
@@ -100,14 +96,14 @@ crate::test_case! {
     update_mtime_ctime_success_folder => [Regular, Block, Char, Fifo, Socket, Symlink(None)]
 }
 fn update_mtime_ctime_success_folder(ctx: &mut TestContext, ft: FileType) {
-    let dir = ctx.new_file(FileType::Dir).create().unwrap();
+    let dir = ctx.create(FileType::Dir).unwrap();
     let file = ctx.new_file(ft).name(dir.join("file")).create().unwrap();
 
-    assert_mtime_changed(ctx, &dir, || {
-        assert_ctime_changed(ctx, &dir, || {
+    assert_times_changed()
+        .path(&dir, CTIME | MTIME)
+        .execute(ctx, false, || {
             assert!(unlink(&file).is_ok());
         });
-    })
 }
 
 crate::test_case! {
