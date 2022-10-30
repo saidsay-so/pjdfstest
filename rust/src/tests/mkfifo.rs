@@ -5,6 +5,7 @@ use nix::{sys::stat::Mode, unistd::mkfifo};
 use crate::runner::context::{SerializedTestContext, TestContext};
 
 use super::errors::enoent::enoent_comp_test_case;
+use super::errors::enospc::enospc_no_free_inodes_test_case;
 use super::errors::enotdir::enotdir_comp_test_case;
 use super::mksyscalls::{assert_perms_from_mode_and_umask, assert_uid_gid};
 use super::{assert_times_changed, ATIME, CTIME, MTIME};
@@ -52,3 +53,6 @@ enotdir_comp_test_case!(mkfifo(~path, Mode::empty()));
 
 // mkfifo/04.t
 enoent_comp_test_case!(mkfifo(~path, Mode::empty()));
+
+// mkfifo/11.t
+enospc_no_free_inodes_test_case!(mkfifo(~path, Mode::empty()));

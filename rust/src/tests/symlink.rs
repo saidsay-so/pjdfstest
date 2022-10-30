@@ -10,7 +10,7 @@ use crate::{
     utils::symlink,
 };
 
-use super::errors::enotdir::enotdir_comp_test_case;
+use super::errors::{enospc::enospc_no_free_inodes_test_case, enotdir::enotdir_comp_test_case};
 
 crate::test_case! {
     /// symlink creates symbolic links
@@ -83,3 +83,9 @@ enotdir_comp_test_case!(symlink(Path::new("test"), ~path));
 
 // symlink/04.t
 enoent_comp_test_case!(symlink(Path::new("test"), ~path));
+
+// symlink/11.t
+enospc_no_free_inodes_test_case!(symlink, |ctx: &mut TestContext, path: &Path| {
+    let file = ctx.create(FileType::Regular).unwrap();
+    symlink(&*file, path)
+});
