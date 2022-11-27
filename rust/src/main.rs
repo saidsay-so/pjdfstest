@@ -1,9 +1,11 @@
 use std::{
+    backtrace::BacktraceStatus,
     collections::HashSet,
     env::current_dir,
     io::{stdout, Write},
     panic::{catch_unwind, set_hook},
-    path::PathBuf,
+    path::{Path, PathBuf},
+    sync::Mutex,
 };
 
 use config::Config;
@@ -16,7 +18,7 @@ use nix::{
     sys::stat::{umask, Mode},
     unistd::Uid,
 };
-use once_cell::sync::OnceCell;
+use std::backtrace::Backtrace;
 use strum::{EnumMessage, IntoEnumIterator};
 
 use tempfile::{tempdir_in, TempDir};
@@ -34,9 +36,23 @@ use test::{FileSystemFeature, SerializedTestContext, TestCase, TestContext, Test
 
 use crate::utils::chmod;
 
-struct PanicLocation(u32, u32, String);
+struct PanicLocation {
+    line: u32,
+    column: u32,
+    file: String,
+}
 
-static PANIC_LOCATION: OnceCell<PanicLocation> = OnceCell::new();
+impl From<&std::panic::Location<'_>> for PanicLocation {
+    fn from(location: &std::panic::Location<'_>) -> Self {
+        Self {
+            line: location.line(),
+            column: location.column(),
+            file: location.file().to_string(),
+        }
+    }
+}
+
+static PANIC_LOCATION: Mutex<Option<(PanicLocation, Backtrace)>> = Mutex::new(None);
 
 #[derive(Debug, Options)]
 struct ArgOptions {
@@ -89,11 +105,11 @@ fn main() -> anyhow::Result<()> {
 
     set_hook(Box::new(|ctx| {
         if let Some(location) = ctx.location() {
-            let _ = PANIC_LOCATION.set(PanicLocation(
-                location.line(),
-                location.column(),
-                location.file().into(),
-            ));
+            let _ = PANIC_LOCATION
+                .lock()
+                // SAFETY: the lock cannot be poisoned if it's single-threaded
+                .unwrap()
+                .replace((location.into(), Backtrace::capture()));
         } else {
             unimplemented!()
         }
@@ -117,7 +133,7 @@ fn main() -> anyhow::Result<()> {
     umask(Mode::empty());
 
     let (failed_count, skipped_count, success_count) =
-        run_test_cases(&test_cases, args.verbose, &config, base_dir)?;
+        run_test_cases(&test_cases, args.verbose, &config, base_dir.path())?;
 
     println!(
         "\nTests: {} failed, {} skipped, {} passed, {} total",
@@ -128,7 +144,7 @@ fn main() -> anyhow::Result<()> {
     );
 
     if failed_count > 0 {
-        Err(anyhow::anyhow!("Some tests have failed"))
+        anyhow::bail!("Some tests have failed")
     } else {
         Ok(())
     }
@@ -140,7 +156,7 @@ fn run_test_cases(
     test_cases: &[&TestCase],
     verbose: bool,
     config: &Config,
-    base_dir: TempDir,
+    base_dir: &Path,
 ) -> Result<(usize, usize, usize), anyhow::Error> {
     let mut failed_tests_count: usize = 0;
     let mut succeeded_tests_count: usize = 0;
@@ -177,7 +193,7 @@ fn run_test_cases(
             skip_message += "\n";
         }
 
-        let temp_dir = tempdir_in(base_dir.path()).unwrap();
+        let temp_dir = tempdir_in(base_dir).unwrap();
         // FIX: some tests need a 0o755 base dir
         chmod(temp_dir.path(), Mode::from_bits_truncate(0o755)).unwrap();
 
@@ -190,7 +206,7 @@ fn run_test_cases(
             skip_message += &*test_case
                 .guards
                 .iter()
-                .filter_map(|guard| guard(config, base_dir.path()).err())
+                .filter_map(|guard| guard(config, temp_dir.path()).err())
                 .map(|err| err.to_string())
                 .collect::<Vec<String>>()
                 .join("\n");
@@ -230,18 +246,26 @@ fn run_test_cases(
                 succeeded_tests_count += 1;
             }
             Err(e) => {
-                let location = PANIC_LOCATION.get().unwrap();
-                println!(
-                    "error: {}, located in file {} at {}:{}",
-                    e.downcast_ref::<String>()
-                        .cloned()
-                        .or_else(|| e.downcast_ref::<&str>().map(|&s| s.to_string()))
-                        .unwrap_or_default(),
-                    location.2,
-                    location.0,
-                    location.1
-                );
+                println!("error");
                 failed_tests_count += 1;
+
+                if verbose {
+                    if let (Some((location, backtrace)), Some(error)) = (
+                        PANIC_LOCATION.lock().unwrap().as_ref(),
+                        e.downcast_ref::<String>()
+                            .map(|s| &**s)
+                            .or_else(|| e.downcast_ref::<&str>().map(|s| *s)),
+                    ) {
+                        println!("message: {error}");
+                        println!(
+                            "located in file {} at {}:{}",
+                            location.file, location.line, location.column,
+                        );
+                        if backtrace.status() == BacktraceStatus::Captured {
+                            println!("backtrace:\n{backtrace}");
+                        }
+                    }
+                }
             }
         }
     }
