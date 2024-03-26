@@ -10,6 +10,8 @@ use nix::unistd::close;
 
 use crate::context::{FileType, SerializedTestContext, TestContext};
 
+mod eacces;
+
 use super::errors::eexist::eexist_file_exists_test_case;
 use super::errors::efault::efault_path_test_case;
 use super::errors::eloop::eloop_comp_test_case;
