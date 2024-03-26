@@ -16,7 +16,7 @@ posix_fallocate = {}
 [settings]
 # naptime is the duration of various short sleeps.  It should be greater than
 # the timestamp granularity of the file system under test.
-naptime = 0.001
+naptime = 0.01
 # Allow to run the EROFS tests, which require to remount the file system on which
 # pjdsfstest is run as read-only.
 allow_remount = false
