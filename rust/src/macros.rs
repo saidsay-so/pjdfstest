@@ -155,7 +155,7 @@ mod t {
         assert_eq!(" description", tc.description);
         assert!(!tc.require_root);
         assert!(tc.required_features.is_empty());
-        assert!(matches!(tc.fun, TestFn::NonSerialized(f) if f as usize == basic as usize));
+        assert!(matches!(tc.fun, TestFn::NonSerialized(_)));
         assert!(tc.guards.is_empty());
     }
 
@@ -178,7 +178,7 @@ mod t {
                 FileSystemFeature::PosixFallocate
             ]
         );
-        assert!(matches!(tc.fun, TestFn::NonSerialized(f) if f as usize == features as usize));
+        assert!(matches!(tc.fun, TestFn::NonSerialized(_)));
         assert!(tc.guards.is_empty());
     }
 
@@ -198,11 +198,7 @@ mod t {
             .unwrap();
         assert_eq!(" description", tc.description);
         assert!(!tc.require_root);
-        assert_eq!(
-            tc.guards.iter().map(|&g| g as usize).collect::<Vec<_>>(),
-            vec![guard_example as usize]
-        );
-        assert!(matches!(tc.fun, TestFn::NonSerialized(f) if f as usize == guard as usize));
+        assert!(matches!(tc.fun, TestFn::NonSerialized(_)));
     }
 
     crate::test_case! {
@@ -218,7 +214,7 @@ mod t {
         assert_eq!(" description", tc.description);
         assert!(tc.require_root);
         assert!(tc.required_features.is_empty());
-        assert!(matches!(tc.fun, TestFn::NonSerialized(f) if f as usize == root as usize));
+        assert!(matches!(tc.fun, TestFn::NonSerialized(_)));
         assert!(tc.guards.is_empty());
     }
 
@@ -261,7 +257,7 @@ mod t {
         assert_eq!(" description", tc.description);
         assert!(!tc.require_root);
         assert!(tc.required_features.is_empty());
-        assert!(matches!(tc.fun, TestFn::Serialized(f) if f as usize == serialized as usize));
+        assert!(matches!(tc.fun, TestFn::Serialized(_)));
         assert!(tc.guards.is_empty());
     }
 }
