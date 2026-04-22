@@ -5,4 +5,4 @@ utime_now = {}
 utimensat = {}
 
 [settings]
-naptime = 0.001
+naptime = 0.01
