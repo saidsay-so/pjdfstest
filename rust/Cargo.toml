@@ -8,8 +8,8 @@ resolver = "2"
 exacl = "0.12.0"
 tempfile = "3.14.0"
 rand = { version = "0.8.6", features = ["min_const_gen"] }
-strum = { version = "0.26.3", features = ["derive"] }
-strum_macros = "0.26.4"
+strum = { version = "0.27.2", features = ["derive"] }
+strum_macros = "0.27.2"
 anyhow = "1.0.93"
 pastey = "0.2.2"
 gumdrop = "0.8.1"
