@@ -1,8 +1,14 @@
 [package]
 name = "pjdfstest"
+description = "A generic POSIX file system test suite."
+authors = ["Sayafdine Said <sayafdine.said@outlook.fr>", "Alan Somers <asomers@gmail.com>"]
+repository = "https://github.com/saidsay-so/pjdfstest"
+categories = ["filesystem", "development-tools::testing"]
+rust-version = "1.85.0"
+keywords = ["filesystem", "test"]
 version = "0.1.0"
 edition = "2021"
-resolver = "2"
+license = "BSD-2-Clause"
 
 [dependencies]
 exacl = "0.12.0"
