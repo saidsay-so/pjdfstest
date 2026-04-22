@@ -82,6 +82,7 @@ _`pjdfstest [OPTIONS] [--] TEST_PATTERNS`_
 - `-e, --exact` - Match names exactly
 - `-v, --verbose` - Verbose mode
 - `-p, --path PATH` - Path where the test suite will be executed
+- `-s, --secondary-fs` - Path to a second, distinct file system needed by some test cases.
 - `[--] TEST_PATTERNS` - Filter tests which match against the provided patterns
 
 Example: `pjdfstest -c pjdfstest.toml chmod`
