@@ -11,7 +11,7 @@ The following dependencies are required to build the project:
 
 #### Common
 
-- Rust (1.72.1 or later)
+- Rust (1.85.0 or later)
 
 #### Linux
 
