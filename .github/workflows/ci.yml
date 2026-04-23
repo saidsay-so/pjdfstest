@@ -2,10 +2,102 @@ on:
   push:
 
 jobs:
-  format_lint_check:
+  freebsd:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - freebsd_version: "15.0"
+            rust_version: "stable"
+    name: FreeBSD ${{ matrix.freebsd_version }} Rust ${{ matrix.rust_version }}
+    env:
+      CFG: ci/freebsd-zfs.toml
+      RUSTFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@v6
+      - name: Start VM
+        uses: vmactions/freebsd-vm@v1
+        with:
+          release: ${{ matrix.freebsd_version }}
+          usesh: true
+          envs: 'RUSTFLAGS CFG'
+      - name: Install dependencies
+        shell: freebsd {0}
+        run: |
+          pkg install -y curl
+          fetch https://sh.rustup.rs -o rustup.sh
+          sh rustup.sh -y --profile=minimal --default-toolchain ${{ matrix.rust_version }}
+      - name: Create user
+        shell: freebsd {0}
+        run: |
+          cat <<EOF | adduser -w none -S -f -
+          pjdfstest::::::Dummy User for pjdfstest:/nonexistent:/sbin/nologin:
+          EOF
+      - name: Build
+        shell: freebsd {0}
+        run: |
+          . $HOME/.cargo/env
+          cd rust
+          cargo build --all-targets
+          cargo build --all-targets --release
+      - name: Test
+        shell: freebsd {0}
+        run: |
+          . $HOME/.cargo/env
+          cd rust
+          cargo test
+          cargo test --release
+      - name: Run
+        shell: freebsd {0}
+        run: |
+          . $HOME/.cargo/env
+          cd rust
+          df -T /tmp
+          target/release/pjdfstest -c $CFG -p /tmp
+          su -m nobody -c "target/release/pjdfstest -c $CFG -p /tmp"
+
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    env:
+      CFG: ci/linux-ext4.toml
+      RUSTFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install libacl1-dev acl
+      - name: Create users
+        run: |
+          cat <<EOF | sudo newusers -r
+          tests:x:::Dummy User for pjdfstest:/:/usr/bin/nologin
+          pjdfstest:x:::Dummy User for pjdfstest:/:/usr/bin/nologin
+          EOF
+      - name: Build
+        working-directory: rust
+        run: |
+          cargo build --all-targets
+          cargo build --all-targets --release
+      - name: Test
+        working-directory: rust
+        run: |
+          cargo test
+          cargo test --release
+      - name: Run
+        working-directory: rust
+        run: |
+          df -T /tmp
+          target/release/pjdfstest -- -c $CFG -p /tmp
+          sudo target/release/pjdfstest -- -c $CFG -p /tmp
+
+  lint:
     runs-on: ubuntu-latest
     env:
       RUSTFLAGS: -D warnings
+      RUSTDOCFLAGS: -D warnings
     steps:
       - uses: actions/checkout@v4
 

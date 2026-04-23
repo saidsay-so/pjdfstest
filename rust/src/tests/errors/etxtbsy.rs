@@ -55,6 +55,7 @@ macro_rules! etxtbsy_test_case {
             $( assert_eq!($f(&exec_path).unwrap_err(), Errno::ETXTBSY); )+
 
             sleep_process.kill().unwrap();
+            sleep_process.wait().unwrap();
         }
     };
 
