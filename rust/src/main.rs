@@ -27,12 +27,12 @@ use std::{
     sync::Mutex,
 };
 
+use clap::Parser;
 use config::Config;
 use figment::{
     providers::{Format, Serialized, Toml},
     Figment,
 };
-use gumdrop::Options;
 use nix::{
     sys::stat::{umask, Mode},
     unistd::Uid,
@@ -59,35 +59,37 @@ use crate::utils::chmod;
 
 static BACKTRACE: Mutex<Option<Backtrace>> = Mutex::new(None);
 
-#[derive(Debug, Options)]
+#[derive(Debug, Parser)]
+#[command(
+    name = "pjdfstest",
+    about = "A generic POSIX file system test suite.",
+    version
+)]
 struct ArgOptions {
-    #[options(help = "print help message")]
-    help: bool,
-
-    #[options(help = "Path of the configuration file")]
+    #[arg(short, long, help = "Path of the configuration file")]
     configuration_file: Option<PathBuf>,
 
-    #[options(help = "List opt-in features")]
+    #[arg(short, long, help = "List opt-in features")]
     list_features: bool,
 
-    #[options(help = "Match names exactly")]
+    #[arg(short, long, help = "Match names exactly")]
     exact: bool,
 
-    #[options(help = "Verbose mode")]
+    #[arg(short, long, help = "Verbose mode")]
     verbose: bool,
 
-    #[options(help = "Path where the test suite will be executed")]
+    #[arg(short, long, help = "Path where the test suite will be executed")]
     path: Option<PathBuf>,
 
-    #[options(free, help = "Filter test names")]
+    #[arg(help = "Filter test names")]
     test_patterns: Vec<String>,
 
-    #[options(help = "Path to a secondary file system")]
+    #[arg(short, long, help = "Path to a secondary file system")]
     secondary_fs: Option<PathBuf>,
 }
 
 fn main() -> anyhow::Result<()> {
-    let args = ArgOptions::parse_args_default_or_exit();
+    let args = ArgOptions::parse();
 
     if args.list_features {
         for feature in FileSystemFeature::iter() {
