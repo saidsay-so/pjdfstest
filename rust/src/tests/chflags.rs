@@ -259,7 +259,7 @@ fn securelevel(ctx: &mut TestContext, ft: FileType) {
     use std::os::unix::ffi::OsStrExt;
 
     let jail = jail::StoppedJail::new("/")
-        .name("pjdfstest_chflags_securelevel")
+        .name(format!("pjdfstest_chflags_securelevel-{}", std::process::id()))
         .param("allow.chflags", jail::param::Value::Int(1))
         .param("securelevel", jail::param::Value::Int(1));
     let jail = jail.start().unwrap();
