@@ -246,15 +246,13 @@ fn run_test_cases(
             );
         }
 
-        // TODO: ;decide what to do about verbose
-        if verbose && !test_case.description.is_empty() {
-            print!("\n\t{}\t\t", test_case.description);
-        }
-
         stdout().lock().flush()?;
 
         if should_skip {
             println!("{:72} skipped", test_case.name);
+            if verbose && !test_case.description.is_empty() {
+                println!("\t{}", test_case.description);
+            }
             for reason in &skip_reasons {
                 println!("\t{}", reason);
             }
@@ -307,6 +305,10 @@ fn run_test_cases(
                 }
                 failed_tests_count += 1;
             }
+        }
+
+        if verbose && !test_case.description.is_empty() {
+            println!("\t{}", test_case.description);
         }
     }
 
