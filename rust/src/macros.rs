@@ -88,7 +88,7 @@ macro_rules! test_case {
     };
     (@serialized $f:ident, $features:expr, $guards:expr, $desc:expr, $require_root:expr => [$( $file_type:tt $( ($ft_args: tt) )? ),+ $(,)*]) => {
         $(
-            paste::paste! {
+            pastey::paste! {
                 ::inventory::submit! {
                     $crate::test::TestCase {
                         name: concat!(module_path!(), "::", stringify!($f), "::", stringify!([<$file_type:lower>])),
@@ -117,7 +117,7 @@ macro_rules! test_case {
     };
     (@ $f:ident, $features:expr, $guards:expr, $require_root:expr, $desc:expr => [$( $file_type:tt $( ($ft_args: tt) )? ),+ $(,)*]) => {
         $(
-            paste::paste! {
+            pastey::paste! {
                 ::inventory::submit! {
                     $crate::test::TestCase {
                         name: concat!(module_path!(), "::", stringify!($f), "::", stringify!([<$file_type:lower>])),
