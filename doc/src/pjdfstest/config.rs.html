@@ -50,29 +50,32 @@
 <a href=#50 id=50 data-nosnippet>50</a>    <span class="doccomment">/// Allow remounting the file system with different settings during tests
 <a href=#51 id=51 data-nosnippet>51</a>    /// (required for example by the `erofs` tests).
 <a href=#52 id=52 data-nosnippet>52</a>    </span><span class="kw">pub </span>allow_remount: bool,
-<a href=#53 id=53 data-nosnippet>53</a>}
-<a href=#54 id=54 data-nosnippet>54</a>
-<a href=#55 id=55 data-nosnippet>55</a><span class="kw">impl </span>Default <span class="kw">for </span>SettingsConfig {
-<a href=#56 id=56 data-nosnippet>56</a>    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-<a href=#57 id=57 data-nosnippet>57</a>        SettingsConfig {
-<a href=#58 id=58 data-nosnippet>58</a>            naptime: default_naptime(),
-<a href=#59 id=59 data-nosnippet>59</a>            allow_remount: <span class="bool-val">false</span>,
-<a href=#60 id=60 data-nosnippet>60</a>        }
-<a href=#61 id=61 data-nosnippet>61</a>    }
-<a href=#62 id=62 data-nosnippet>62</a>}
-<a href=#63 id=63 data-nosnippet>63</a>
-<a href=#64 id=64 data-nosnippet>64</a><span class="kw">const fn </span>default_naptime() -&gt; f64 {
-<a href=#65 id=65 data-nosnippet>65</a>    <span class="number">1.0
-<a href=#66 id=66 data-nosnippet>66</a></span>}
-<a href=#67 id=67 data-nosnippet>67</a>
-<a href=#68 id=68 data-nosnippet>68</a><span class="doccomment">/// Configuration for the test suite.
-<a href=#69 id=69 data-nosnippet>69</a></span><span class="attr">#[derive(Debug, Serialize, Deserialize, Default)]
-<a href=#70 id=70 data-nosnippet>70</a></span><span class="kw">pub struct </span>Config {
-<a href=#71 id=71 data-nosnippet>71</a>    <span class="doccomment">/// File-system features.
-<a href=#72 id=72 data-nosnippet>72</a>    </span><span class="kw">pub </span>features: FeaturesConfig,
-<a href=#73 id=73 data-nosnippet>73</a>    <span class="doccomment">/// File-system specific settings.
-<a href=#74 id=74 data-nosnippet>74</a>    </span><span class="kw">pub </span>settings: SettingsConfig,
-<a href=#75 id=75 data-nosnippet>75</a>    <span class="doccomment">/// Dummy authentication configuration.
-<a href=#76 id=76 data-nosnippet>76</a>    </span><span class="kw">pub </span>dummy_auth: DummyAuthConfig,
-<a href=#77 id=77 data-nosnippet>77</a>}
+<a href=#53 id=53 data-nosnippet>53</a>    <span class="doccomment">/// Test cases that are expected to fail
+<a href=#54 id=54 data-nosnippet>54</a>    </span><span class="kw">pub </span>expected_failures: HashSet&lt;String&gt;,
+<a href=#55 id=55 data-nosnippet>55</a>}
+<a href=#56 id=56 data-nosnippet>56</a>
+<a href=#57 id=57 data-nosnippet>57</a><span class="kw">impl </span>Default <span class="kw">for </span>SettingsConfig {
+<a href=#58 id=58 data-nosnippet>58</a>    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+<a href=#59 id=59 data-nosnippet>59</a>        SettingsConfig {
+<a href=#60 id=60 data-nosnippet>60</a>            naptime: default_naptime(),
+<a href=#61 id=61 data-nosnippet>61</a>            allow_remount: <span class="bool-val">false</span>,
+<a href=#62 id=62 data-nosnippet>62</a>            expected_failures: Default::default(),
+<a href=#63 id=63 data-nosnippet>63</a>        }
+<a href=#64 id=64 data-nosnippet>64</a>    }
+<a href=#65 id=65 data-nosnippet>65</a>}
+<a href=#66 id=66 data-nosnippet>66</a>
+<a href=#67 id=67 data-nosnippet>67</a><span class="kw">const fn </span>default_naptime() -&gt; f64 {
+<a href=#68 id=68 data-nosnippet>68</a>    <span class="number">1.0
+<a href=#69 id=69 data-nosnippet>69</a></span>}
+<a href=#70 id=70 data-nosnippet>70</a>
+<a href=#71 id=71 data-nosnippet>71</a><span class="doccomment">/// Configuration for the test suite.
+<a href=#72 id=72 data-nosnippet>72</a></span><span class="attr">#[derive(Debug, Serialize, Deserialize, Default)]
+<a href=#73 id=73 data-nosnippet>73</a></span><span class="kw">pub struct </span>Config {
+<a href=#74 id=74 data-nosnippet>74</a>    <span class="doccomment">/// File-system features.
+<a href=#75 id=75 data-nosnippet>75</a>    </span><span class="kw">pub </span>features: FeaturesConfig,
+<a href=#76 id=76 data-nosnippet>76</a>    <span class="doccomment">/// File-system specific settings.
+<a href=#77 id=77 data-nosnippet>77</a>    </span><span class="kw">pub </span>settings: SettingsConfig,
+<a href=#78 id=78 data-nosnippet>78</a>    <span class="doccomment">/// Dummy authentication configuration.
+<a href=#79 id=79 data-nosnippet>79</a>    </span><span class="kw">pub </span>dummy_auth: DummyAuthConfig,
+<a href=#80 id=80 data-nosnippet>80</a>}
 </code></pre></div></section></main></body></html>
