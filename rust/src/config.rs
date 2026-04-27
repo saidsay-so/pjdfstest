@@ -50,6 +50,8 @@ pub struct SettingsConfig {
     /// Allow remounting the file system with different settings during tests
     /// (required for example by the `erofs` tests).
     pub allow_remount: bool,
+    /// Test cases that are expected to fail
+    pub expected_failures: HashSet<String>,
 }
 
 impl Default for SettingsConfig {
@@ -57,6 +59,7 @@ impl Default for SettingsConfig {
         SettingsConfig {
             naptime: default_naptime(),
             allow_remount: false,
+            expected_failures: Default::default(),
         }
     }
 }

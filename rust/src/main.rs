@@ -86,6 +86,25 @@ struct ArgOptions {
     secondary_fs: Option<PathBuf>,
 }
 
+#[derive(Clone, Copy, Debug, Default)]
+struct OverallResult {
+    pass: usize,
+    fail: usize,
+    skip: usize,
+    expect_fail: usize,
+    unexpect_pass: usize,
+}
+
+impl OverallResult {
+    fn pass(&self) -> bool {
+        self.fail + self.unexpect_pass == 0
+    }
+
+    fn total(&self) -> usize {
+        self.pass + self.fail + self.skip + self.expect_fail + self.unexpect_pass
+    }
+}
+
 fn main() -> anyhow::Result<()> {
     let args = ArgOptions::parse_args_default_or_exit();
 
@@ -144,21 +163,21 @@ fn main() -> anyhow::Result<()> {
 
     umask(Mode::empty());
 
-    let (failed_count, skipped_count, success_count) =
-        run_test_cases(&test_cases, args.verbose, &config, base_dir)?;
+    let overall_result = run_test_cases(&test_cases, args.verbose, &config, base_dir)?;
 
     println!(
-        "\nTests: {} failed, {} skipped, {} passed, {} total",
-        failed_count,
-        skipped_count,
-        success_count,
-        failed_count + skipped_count + success_count,
+        "\nTests: {} failed, {} skipped, {} passed, {} expected failures {} total",
+        overall_result.fail + overall_result.unexpect_pass,
+        overall_result.skip,
+        overall_result.pass,
+        overall_result.expect_fail,
+        overall_result.total()
     );
 
-    if failed_count > 0 {
-        Err(anyhow::anyhow!("Some tests have failed"))
-    } else {
+    if overall_result.pass() {
         Ok(())
+    } else {
+        Err(anyhow::anyhow!("Some tests have failed"))
     }
 }
 
@@ -169,10 +188,12 @@ fn run_test_cases(
     verbose: bool,
     config: &Config,
     base_dir: TempDir,
-) -> Result<(usize, usize, usize), anyhow::Error> {
+) -> Result<OverallResult, anyhow::Error> {
     let mut failed_tests_count: usize = 0;
     let mut succeeded_tests_count: usize = 0;
     let mut skipped_tests_count: usize = 0;
+    let mut unexpected_success_count: usize = 0;
+    let mut expected_fail_count: usize = 0;
 
     let is_root = Uid::current().is_root();
 
@@ -185,6 +206,7 @@ fn run_test_cases(
         let mut should_skip = test_case.require_root && !is_root;
         let mut skip_reasons = Vec::<String>::new();
 
+        let expect_fail = config.settings.expected_failures.contains(test_case.name);
         if should_skip {
             skip_reasons.push(String::from("requires root privileges"));
         }
@@ -252,9 +274,17 @@ fn run_test_cases(
         });
 
         match result {
-            Ok(_) => {
+            Ok(_) if !expect_fail => {
                 println!("{:77} ok", test_case.name);
                 succeeded_tests_count += 1;
+            }
+            Ok(_) => {
+                println!("{:60} PASSED UNEXPECTEDLY", test_case.name);
+                unexpected_success_count += 1;
+            }
+            Err(_) if expect_fail => {
+                println!("{:61} failed as expected", test_case.name);
+                expected_fail_count += 1;
             }
             Err(e) => {
                 let backtrace = BACKTRACE
@@ -278,9 +308,11 @@ fn run_test_cases(
         }
     }
 
-    Ok((
-        failed_tests_count,
-        skipped_tests_count,
-        succeeded_tests_count,
-    ))
+    Ok(OverallResult {
+        fail: failed_tests_count,
+        skip: skipped_tests_count,
+        pass: succeeded_tests_count,
+        unexpect_pass: unexpected_success_count,
+        expect_fail: expected_fail_count,
+    })
 }

@@ -82,6 +82,7 @@ entries = [
 [settings]
 naptime = 0.001
 allow_remount = false
+expected_failures = []
 ```
 
 - `naptime` - The duration for a "short" sleep. It should be greater than the
@@ -90,3 +91,11 @@ allow_remount = false
 - `allow_remount` - If set to `true`, the runner will run the EROFS tests,
   which require to remount the file system on which
   pjdsfstest is run as read-only.
+- `expected_failures` - A list of test case names.  Any test case present here
+  will be expected to fail, and its failure will not cause the entire run to be
+  considered a failure.  But inversely, if a test case listed here passes, that
+  _will_ cause the entire run to be considered a failure.  This mechanism can
+  be used by file systems under development to detect regressions before they
+  are fully implemented.  It can also be used as a more granular feature gate.
+  However, note that tests listed here will still be run, unlike tests whose
+  execution is filtered out by the `features` section.
