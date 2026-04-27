@@ -88,7 +88,7 @@
 <a href=#88 id=88 data-nosnippet>88</a>    };
 <a href=#89 id=89 data-nosnippet>89</a>    (@serialized <span class="macro-nonterminal">$f</span>:ident, <span class="macro-nonterminal">$features</span>:expr, <span class="macro-nonterminal">$guards</span>:expr, <span class="macro-nonterminal">$desc</span>:expr, <span class="macro-nonterminal">$require_root</span>:expr =&gt; [$( <span class="macro-nonterminal">$file_type</span>:tt $( (<span class="macro-nonterminal">$ft_args</span>: tt) )<span class="question-mark">? </span>),+ $(,)<span class="kw-2">*</span>]) =&gt; {
 <a href=#90 id=90 data-nosnippet>90</a>        $(
-<a href=#91 id=91 data-nosnippet>91</a>            <span class="macro">paste::paste!</span> {
+<a href=#91 id=91 data-nosnippet>91</a>            <span class="macro">pastey::paste!</span> {
 <a href=#92 id=92 data-nosnippet>92</a>                <span class="macro">::inventory::submit!</span> {
 <a href=#93 id=93 data-nosnippet>93</a>                    <span class="macro-nonterminal">$crate::test::TestCase </span>{
 <a href=#94 id=94 data-nosnippet>94</a>                        name: <span class="macro">concat!</span>(<span class="macro">module_path!</span>(), <span class="string">"::"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$f</span>), <span class="string">"::"</span>, <span class="macro">stringify!</span>([&lt;<span class="macro-nonterminal">$file_type</span>:lower&gt;])),
@@ -117,7 +117,7 @@
 <a href=#117 id=117 data-nosnippet>117</a>    };
 <a href=#118 id=118 data-nosnippet>118</a>    (@ <span class="macro-nonterminal">$f</span>:ident, <span class="macro-nonterminal">$features</span>:expr, <span class="macro-nonterminal">$guards</span>:expr, <span class="macro-nonterminal">$require_root</span>:expr, <span class="macro-nonterminal">$desc</span>:expr =&gt; [$( <span class="macro-nonterminal">$file_type</span>:tt $( (<span class="macro-nonterminal">$ft_args</span>: tt) )<span class="question-mark">? </span>),+ $(,)<span class="kw-2">*</span>]) =&gt; {
 <a href=#119 id=119 data-nosnippet>119</a>        $(
-<a href=#120 id=120 data-nosnippet>120</a>            <span class="macro">paste::paste!</span> {
+<a href=#120 id=120 data-nosnippet>120</a>            <span class="macro">pastey::paste!</span> {
 <a href=#121 id=121 data-nosnippet>121</a>                <span class="macro">::inventory::submit!</span> {
 <a href=#122 id=122 data-nosnippet>122</a>                    <span class="macro-nonterminal">$crate::test::TestCase </span>{
 <a href=#123 id=123 data-nosnippet>123</a>                        name: <span class="macro">concat!</span>(<span class="macro">module_path!</span>(), <span class="string">"::"</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$f</span>), <span class="string">"::"</span>, <span class="macro">stringify!</span>([&lt;<span class="macro-nonterminal">$file_type</span>:lower&gt;])),
