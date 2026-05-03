@@ -27,6 +27,7 @@ use std::{
     sync::Mutex,
 };
 
+use colored::{Color, Colorize};
 use config::Config;
 use figment::{
     providers::{Format, Serialized, Toml},
@@ -96,6 +97,14 @@ struct OverallResult {
 }
 
 impl OverallResult {
+    fn color(&self) -> Color {
+        if self.pass() {
+            Color::Green
+        } else {
+            Color::Red
+        }
+    }
+
     fn pass(&self) -> bool {
         self.fail + self.unexpect_pass == 0
     }
@@ -166,11 +175,16 @@ fn main() -> anyhow::Result<()> {
     let overall_result = run_test_cases(&test_cases, args.verbose, &config, base_dir)?;
 
     println!(
-        "\nTests: {} failed, {} skipped, {} passed, {} expected failures {} total",
-        overall_result.fail + overall_result.unexpect_pass,
+        "\n{}: {} {}, {} {}, {} {}, {} {}, {} total",
+        "Summary".color(overall_result.color()).bold(),
+        (overall_result.fail + overall_result.unexpect_pass),
+        "failed".red().bold(),
         overall_result.skip,
+        "skipped".yellow().bold(),
         overall_result.pass,
+        "passed".green().bold(),
         overall_result.expect_fail,
+        "expected failures".bright_green().bold(),
         overall_result.total()
     );
 
@@ -244,17 +258,15 @@ fn run_test_cases(
             );
         }
 
-        // TODO: ;decide what to do about verbose
-        if verbose && !test_case.description.is_empty() {
-            print!("\n\t{}\t\t", test_case.description);
-        }
-
         stdout().lock().flush()?;
 
         if should_skip {
-            println!("{:72} skipped", test_case.name);
+            println!("{:72} {}", test_case.name.blue(), "skipped".yellow());
+            if verbose && !test_case.description.is_empty() {
+                println!("\t{}", test_case.description);
+            }
             for reason in &skip_reasons {
-                println!("\t{}", reason);
+                println!("\t{}", reason.yellow());
             }
             skipped_tests_count += 1;
             continue;
@@ -273,18 +285,29 @@ fn run_test_cases(
             }
         });
 
-        match result {
+        let error_info = match result {
             Ok(_) if !expect_fail => {
-                println!("{:77} ok", test_case.name);
+                println!("{:77} {}", test_case.name.blue(), "ok".green());
                 succeeded_tests_count += 1;
+                None
             }
             Ok(_) => {
-                println!("{:60} PASSED UNEXPECTEDLY", test_case.name);
+                println!(
+                    "{:60} {}",
+                    test_case.name.blue(),
+                    "PASSED UNEXPECTEDLY".red()
+                );
                 unexpected_success_count += 1;
+                None
             }
             Err(_) if expect_fail => {
-                println!("{:61} failed as expected", test_case.name);
+                println!(
+                    "{:61} {}",
+                    test_case.name.blue(),
+                    "failed as expected".green()
+                );
                 expected_fail_count += 1;
+                None
             }
             Err(e) => {
                 let backtrace = BACKTRACE
@@ -299,11 +322,18 @@ fn run_test_cases(
                         _ => "Unknown Source of Error".to_owned(),
                     },
                 };
-                println!("{:73} FAILED\n\t{}", test_case.name, panic_information);
-                if let Some(backtrace) = backtrace {
-                    println!("Backtrace:\n{}", backtrace);
-                }
+                println!("{:73} {}", test_case.name.blue(), "FAILED".red());
                 failed_tests_count += 1;
+                Some((panic_information, backtrace))
+            }
+        };
+        if verbose && !test_case.description.is_empty() {
+            println!("\t{}", test_case.description);
+        }
+        if let Some((panic_information, backtrace)) = error_info {
+            println!("\t{}", panic_information);
+            if let Some(backtrace) = backtrace {
+                println!("Backtrace:\n{}", backtrace);
             }
         }
     }
