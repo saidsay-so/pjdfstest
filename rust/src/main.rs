@@ -29,10 +29,6 @@ use std::{
 
 use clap::Parser;
 use config::Config;
-use figment::{
-    providers::{Format, Serialized, Toml},
-    Figment,
-};
 use nix::{
     sys::stat::{umask, Mode},
     unistd::Uid,
@@ -117,16 +113,11 @@ fn main() -> anyhow::Result<()> {
         return Ok(());
     }
 
-    let config: Config = {
-        let mut figment = Figment::from(Serialized::defaults(Config::default()));
-        if let Some(path) = args.configuration_file.as_deref() {
-            figment = figment.merge(Toml::file(path))
-        }
-
-        let mut config: Config = figment.extract()?;
-        config.features.secondary_fs = args.secondary_fs;
-        config
-    };
+    let config = args
+        .configuration_file
+        .as_ref()
+        .map(Config::load)
+        .unwrap_or_default();
 
     let path = args
         .path
