@@ -2,6 +2,7 @@
 name = "pjdfstest"
 description = "A generic POSIX file system test suite."
 authors = ["Sayafdine Said <sayafdine.said@outlook.fr>", "Alan Somers <asomers@gmail.com>"]
+documentation = "https://saidsay-so.github.io/pjdfstest/"
 repository = "https://github.com/saidsay-so/pjdfstest"
 categories = ["filesystem", "development-tools::testing"]
 rust-version = "1.85.0"
