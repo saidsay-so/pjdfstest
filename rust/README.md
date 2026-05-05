@@ -5,23 +5,25 @@ The test suite has been rewritten in Rust as part of the Google Summer of Code 2
 
 ## Build
 
-### Requirements
+```bash
+cd rust
+cargo build --release
+```
 
-The following dependencies are required to build the project:
+### Requirements
 
 #### Common
 
 - Rust (1.85.0 or later)
 
+#### FreeBSD
+
+Beyond the Rust toolchain, no extra packages are required to build.
+
 #### Linux
 
 - libacl1-dev (Debian/Ubuntu), libacl-devel (Fedora), acl (Arch)
 - acl
-
-```bash
-cd rust
-cargo run
-```
 
 ## Documentation
 
@@ -85,7 +87,7 @@ _`pjdfstest [OPTIONS] [--] TEST_PATTERNS`_
 - `-s, --secondary-fs` - Path to a second, distinct file system needed by some test cases.
 - `[--] TEST_PATTERNS` - Filter tests which match against the provided patterns
 
-Example: `pjdfstest -c pjdfstest.toml chmod`
+Example: `pjdfstest -c pjdfstest.toml -p /mnt chmod`
 
 ## Filter tests
 
