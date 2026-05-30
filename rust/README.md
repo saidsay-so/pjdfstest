@@ -116,21 +116,13 @@ It is also possible to specify other users with the configuration file.
 
 #### FreeBSD
 
-FreeBSD by default has enough builtin users.  But additional ones can be
-created like this:
-
-```bash
-cat <<EOF | adduser -w none -S -f -
-pjdfstest::::::Dummy User for pjdfstest:/nonexistent:/sbin/nologin:
-EOF
-```
+FreeBSD by default has enough builtin users.
 
 #### Linux
 
 ```bash
 cat <<EOF | newusers
 tests:x:::Dummy User for pjdfstest:/:/usr/bin/nologin
-pjdfstest:x:::Dummy User for pjdfstest:/:/usr/bin/nologin
 EOF
 ```
 
