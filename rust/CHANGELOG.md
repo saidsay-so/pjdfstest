@@ -1,4 +1,4 @@
-## [unreleased] - ReleaseDate
+## [Unreleased] - ReleaseDate
 
 ### Fixed
 
