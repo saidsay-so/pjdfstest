@@ -103,19 +103,18 @@
 <a href=#103 id=103 data-nosnippet>103</a>        <span class="macro">assert!</span>(filestat.st_gid == egid || filestat.st_gid == dirstat.st_gid);
 <a href=#104 id=104 data-nosnippet>104</a>    }
 <a href=#105 id=105 data-nosnippet>105</a>
-<a href=#106 id=106 data-nosnippet>106</a>    <span class="kw">let </span>user = User::from_uid(Uid::effective()).unwrap().unwrap();
-<a href=#107 id=107 data-nosnippet>107</a>    doit(ctx, <span class="kw-2">&amp;</span>user, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>f);
+<a href=#106 id=106 data-nosnippet>106</a>    <span class="kw">let </span>user0 = User::from_uid(Uid::effective()).unwrap().unwrap();
+<a href=#107 id=107 data-nosnippet>107</a>    doit(ctx, <span class="kw-2">&amp;</span>user0, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>f);
 <a href=#108 id=108 data-nosnippet>108</a>
-<a href=#109 id=109 data-nosnippet>109</a>    <span class="kw">let </span>user = ctx.get_new_user();
+<a href=#109 id=109 data-nosnippet>109</a>    <span class="kw">let </span>user1 = ctx.get_new_user();
 <a href=#110 id=110 data-nosnippet>110</a>    <span class="comment">// To check that the entry gid is either parent gid or egid
-<a href=#111 id=111 data-nosnippet>111</a>    </span>chown(ctx.base_path(), <span class="prelude-val">Some</span>(user.uid), <span class="prelude-val">Some</span>(user.gid)).unwrap();
+<a href=#111 id=111 data-nosnippet>111</a>    </span>chown(ctx.base_path(), <span class="prelude-val">Some</span>(user1.uid), <span class="prelude-val">Some</span>(user1.gid)).unwrap();
 <a href=#112 id=112 data-nosnippet>112</a>
-<a href=#113 id=113 data-nosnippet>113</a>    <span class="kw">let </span>(other_user, group) = ctx.get_new_entry();
-<a href=#114 id=114 data-nosnippet>114</a>    doit(ctx, user, <span class="prelude-val">Some</span>(group.gid), <span class="kw-2">&amp;</span>f);
+<a href=#113 id=113 data-nosnippet>113</a>    <span class="kw">let </span>(user2, group2) = ctx.get_new_entry();
+<a href=#114 id=114 data-nosnippet>114</a>    doit(ctx, user1, <span class="prelude-val">Some</span>(group2.gid), <span class="kw-2">&amp;</span>f);
 <a href=#115 id=115 data-nosnippet>115</a>
 <a href=#116 id=116 data-nosnippet>116</a>    chmod(ctx.base_path(), Mode::from_bits_truncate(ALLPERMS)).unwrap();
 <a href=#117 id=117 data-nosnippet>117</a>
-<a href=#118 id=118 data-nosnippet>118</a>    <span class="kw">let </span>group = ctx.get_new_group();
-<a href=#119 id=119 data-nosnippet>119</a>    doit(ctx, other_user, <span class="prelude-val">Some</span>(group.gid), f);
-<a href=#120 id=120 data-nosnippet>120</a>}
+<a href=#118 id=118 data-nosnippet>118</a>    doit(ctx, user2, <span class="prelude-val">Some</span>(group2.gid), f);
+<a href=#119 id=119 data-nosnippet>119</a>}
 </code></pre></div></section></main></body></html>
