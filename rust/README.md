@@ -61,14 +61,13 @@ allow_remount = false
 # This section allows to modify the mechanism for switching users, which is required by some tests.
 # [dummy_auth]
 # An entry is the name of a user and its associated group.
-# For now, the array requires exactly 3 entries.
+# For now, the array requires exactly 2 entries.
 # Please see the book for more details.
 # entries = [
 #   ["nobody", "nobody"],
 #   nogroup instead for some Linux distros
 #   ["nobody", "nogroup"],
 #   ["tests", "tests"],
-#   ["pjdfstest", "pjdfstest"],
 # ]
 ```
 
@@ -110,7 +109,6 @@ By default, the users (with the same name for the group associated to each of th
 
 - nobody
 - tests
-- pjdfstest
 
 It is also possible to specify other users with the configuration file.
 
@@ -118,18 +116,13 @@ It is also possible to specify other users with the configuration file.
 
 #### FreeBSD
 
-```bash
-cat <<EOF | adduser -w none -S -f -
-pjdfstest::::::Dummy User for pjdfstest:/nonexistent:/sbin/nologin:
-EOF
-```
+FreeBSD by default has enough builtin users.
 
 #### Linux
 
 ```bash
 cat <<EOF | newusers
 tests:x:::Dummy User for pjdfstest:/:/usr/bin/nologin
-pjdfstest:x:::Dummy User for pjdfstest:/:/usr/bin/nologin
 EOF
 ```
 

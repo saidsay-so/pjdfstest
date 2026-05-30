@@ -106,7 +106,7 @@ pub struct DummyAuthConfig {
     /// Auth entries, which are composed of a [`User`] and its associated [`Group`].
     /// The user should be part of the associated group.
     /// They are used when a test requires switching to different users.
-    pub entries: [DummyAuthEntry; 3],
+    pub entries: [DummyAuthEntry; 2],
 }
 
 impl Default for DummyAuthConfig {
@@ -119,14 +119,6 @@ impl Default for DummyAuthConfig {
             eprintln!("error: {}: no such group", unobody.gid);
             exit(1);
         });
-        let upjdfstest = User::from_name("pjdfstest").unwrap().unwrap_or_else(|| {
-            eprintln!("error: pjdfstest: no such user");
-            exit(1);
-        });
-        let gpjdfstest = Group::from_gid(upjdfstest.gid).unwrap().unwrap_or_else(|| {
-            eprintln!("error: {}: no such group", upjdfstest.gid);
-            exit(1);
-        });
         let utests = User::from_name("tests").unwrap().unwrap_or_else(|| {
             eprintln!("error: tests: no such user");
             exit(1);
@@ -137,15 +129,9 @@ impl Default for DummyAuthConfig {
         });
         Self {
             entries: [
-                {
-                    DummyAuthEntry {
-                        user: unobody,
-                        group: gnobody,
-                    }
-                },
                 DummyAuthEntry {
-                    user: upjdfstest,
-                    group: gpjdfstest,
+                    user: unobody,
+                    group: gnobody,
                 },
                 DummyAuthEntry {
                     user: utests,

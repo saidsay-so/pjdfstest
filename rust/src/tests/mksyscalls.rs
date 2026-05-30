@@ -103,18 +103,17 @@ where
         assert!(filestat.st_gid == egid || filestat.st_gid == dirstat.st_gid);
     }
 
-    let user = User::from_uid(Uid::effective()).unwrap().unwrap();
-    doit(ctx, &user, None, &f);
+    let user0 = User::from_uid(Uid::effective()).unwrap().unwrap();
+    doit(ctx, &user0, None, &f);
 
-    let user = ctx.get_new_user();
+    let user1 = ctx.get_new_user();
     // To check that the entry gid is either parent gid or egid
-    chown(ctx.base_path(), Some(user.uid), Some(user.gid)).unwrap();
+    chown(ctx.base_path(), Some(user1.uid), Some(user1.gid)).unwrap();
 
-    let (other_user, group) = ctx.get_new_entry();
-    doit(ctx, user, Some(group.gid), &f);
+    let (user2, group2) = ctx.get_new_entry();
+    doit(ctx, user1, Some(group2.gid), &f);
 
     chmod(ctx.base_path(), Mode::from_bits_truncate(ALLPERMS)).unwrap();
 
-    let group = ctx.get_new_group();
-    doit(ctx, other_user, Some(group.gid), f);
+    doit(ctx, user2, Some(group2.gid), f);
 }
