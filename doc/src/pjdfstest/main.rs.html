@@ -122,225 +122,228 @@
 <a href=#122 id=122 data-nosnippet>122</a>        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
 <a href=#123 id=123 data-nosnippet>123</a>    }
 <a href=#124 id=124 data-nosnippet>124</a>
-<a href=#125 id=125 data-nosnippet>125</a>    <span class="kw">let </span>config = args
+<a href=#125 id=125 data-nosnippet>125</a>    <span class="kw">let </span><span class="kw-2">mut </span>config = args
 <a href=#126 id=126 data-nosnippet>126</a>        .configuration_file
 <a href=#127 id=127 data-nosnippet>127</a>        .as_ref()
 <a href=#128 id=128 data-nosnippet>128</a>        .map(Config::load)
 <a href=#129 id=129 data-nosnippet>129</a>        .unwrap_or_default();
-<a href=#130 id=130 data-nosnippet>130</a>
-<a href=#131 id=131 data-nosnippet>131</a>    <span class="kw">let </span>path = args
-<a href=#132 id=132 data-nosnippet>132</a>        .path
-<a href=#133 id=133 data-nosnippet>133</a>        .ok_or_else(|| <span class="macro">anyhow::anyhow!</span>(<span class="string">"cannot get current dir"</span>))
-<a href=#134 id=134 data-nosnippet>134</a>        .or_else(|<span class="kw">_</span>| current_dir())<span class="question-mark">?</span>;
-<a href=#135 id=135 data-nosnippet>135</a>    <span class="kw">let </span>base_dir = tempdir_in(path)<span class="question-mark">?</span>;
-<a href=#136 id=136 data-nosnippet>136</a>
-<a href=#137 id=137 data-nosnippet>137</a>    set_hook(Box::new(|<span class="kw">_</span>| {
-<a href=#138 id=138 data-nosnippet>138</a>        <span class="kw-2">*</span>BACKTRACE.lock().unwrap() = <span class="prelude-val">Some</span>(Backtrace::capture());
-<a href=#139 id=139 data-nosnippet>139</a>    }));
-<a href=#140 id=140 data-nosnippet>140</a>
-<a href=#141 id=141 data-nosnippet>141</a>    <span class="kw">let </span>test_cases = inventory::iter::&lt;TestCase&gt;;
-<a href=#142 id=142 data-nosnippet>142</a>    <span class="kw">let </span>test_cases: Vec&lt;<span class="kw">_</span>&gt; = test_cases
-<a href=#143 id=143 data-nosnippet>143</a>        .into_iter()
-<a href=#144 id=144 data-nosnippet>144</a>        .filter(|case| {
-<a href=#145 id=145 data-nosnippet>145</a>            args.test_patterns.is_empty()
-<a href=#146 id=146 data-nosnippet>146</a>                || args.test_patterns.iter().any(|pat| {
-<a href=#147 id=147 data-nosnippet>147</a>                    <span class="kw">if </span>args.exact {
-<a href=#148 id=148 data-nosnippet>148</a>                        case.name == pat
-<a href=#149 id=149 data-nosnippet>149</a>                    } <span class="kw">else </span>{
-<a href=#150 id=150 data-nosnippet>150</a>                        case.name.contains(pat)
-<a href=#151 id=151 data-nosnippet>151</a>                    }
-<a href=#152 id=152 data-nosnippet>152</a>                })
-<a href=#153 id=153 data-nosnippet>153</a>        })
-<a href=#154 id=154 data-nosnippet>154</a>        .map(|tc: <span class="kw-2">&amp;</span>TestCase| TestCase {
-<a href=#155 id=155 data-nosnippet>155</a>            <span class="comment">// Ideally trim_start_matches could be done in test_case!, but only
-<a href=#156 id=156 data-nosnippet>156</a>            // const functions are allowed there.
-<a href=#157 id=157 data-nosnippet>157</a>            </span>name: tc.name.trim_start_matches(<span class="string">"pjdfstest::tests::"</span>),
-<a href=#158 id=158 data-nosnippet>158</a>            description: tc.description,
-<a href=#159 id=159 data-nosnippet>159</a>            require_root: tc.require_root,
-<a href=#160 id=160 data-nosnippet>160</a>            fun: tc.fun,
-<a href=#161 id=161 data-nosnippet>161</a>            required_features: tc.required_features,
-<a href=#162 id=162 data-nosnippet>162</a>            guards: tc.guards,
-<a href=#163 id=163 data-nosnippet>163</a>        })
-<a href=#164 id=164 data-nosnippet>164</a>        .collect();
-<a href=#165 id=165 data-nosnippet>165</a>
-<a href=#166 id=166 data-nosnippet>166</a>    umask(Mode::empty());
-<a href=#167 id=167 data-nosnippet>167</a>
-<a href=#168 id=168 data-nosnippet>168</a>    <span class="kw">let </span>overall_result = run_test_cases(<span class="kw-2">&amp;</span>test_cases, args.verbose, <span class="kw-2">&amp;</span>config, base_dir)<span class="question-mark">?</span>;
-<a href=#169 id=169 data-nosnippet>169</a>
-<a href=#170 id=170 data-nosnippet>170</a>    <span class="macro">println!</span>(
-<a href=#171 id=171 data-nosnippet>171</a>        <span class="string">"\n{}: {} {}, {} {}, {} {}, {} {}, {} total"</span>,
-<a href=#172 id=172 data-nosnippet>172</a>        <span class="string">"Summary"</span>.color(overall_result.color()).bold(),
-<a href=#173 id=173 data-nosnippet>173</a>        (overall_result.fail + overall_result.unexpect_pass),
-<a href=#174 id=174 data-nosnippet>174</a>        <span class="string">"failed"</span>.red().bold(),
-<a href=#175 id=175 data-nosnippet>175</a>        overall_result.skip,
-<a href=#176 id=176 data-nosnippet>176</a>        <span class="string">"skipped"</span>.yellow().bold(),
-<a href=#177 id=177 data-nosnippet>177</a>        overall_result.pass,
-<a href=#178 id=178 data-nosnippet>178</a>        <span class="string">"passed"</span>.green().bold(),
-<a href=#179 id=179 data-nosnippet>179</a>        overall_result.expect_fail,
-<a href=#180 id=180 data-nosnippet>180</a>        <span class="string">"expected failures"</span>.bright_green().bold(),
-<a href=#181 id=181 data-nosnippet>181</a>        overall_result.total()
-<a href=#182 id=182 data-nosnippet>182</a>    );
-<a href=#183 id=183 data-nosnippet>183</a>
-<a href=#184 id=184 data-nosnippet>184</a>    <span class="kw">if </span>overall_result.pass() {
-<a href=#185 id=185 data-nosnippet>185</a>        <span class="prelude-val">Ok</span>(())
-<a href=#186 id=186 data-nosnippet>186</a>    } <span class="kw">else </span>{
-<a href=#187 id=187 data-nosnippet>187</a>        <span class="prelude-val">Err</span>(<span class="macro">anyhow::anyhow!</span>(<span class="string">"Some tests have failed"</span>))
-<a href=#188 id=188 data-nosnippet>188</a>    }
-<a href=#189 id=189 data-nosnippet>189</a>}
-<a href=#190 id=190 data-nosnippet>190</a>
-<a href=#191 id=191 data-nosnippet>191</a><span class="doccomment">/// Run provided test cases and filter according to features and flags availability.
-<a href=#192 id=192 data-nosnippet>192</a></span><span class="comment">//TODO: Refactor this function
-<a href=#193 id=193 data-nosnippet>193</a></span><span class="kw">fn </span>run_test_cases(
-<a href=#194 id=194 data-nosnippet>194</a>    test_cases: <span class="kw-2">&amp;</span>[TestCase],
-<a href=#195 id=195 data-nosnippet>195</a>    verbose: bool,
-<a href=#196 id=196 data-nosnippet>196</a>    config: <span class="kw-2">&amp;</span>Config,
-<a href=#197 id=197 data-nosnippet>197</a>    base_dir: TempDir,
-<a href=#198 id=198 data-nosnippet>198</a>) -&gt; <span class="prelude-ty">Result</span>&lt;OverallResult, anyhow::Error&gt; {
-<a href=#199 id=199 data-nosnippet>199</a>    <span class="kw">let </span><span class="kw-2">mut </span>failed_tests_count: usize = <span class="number">0</span>;
-<a href=#200 id=200 data-nosnippet>200</a>    <span class="kw">let </span><span class="kw-2">mut </span>succeeded_tests_count: usize = <span class="number">0</span>;
-<a href=#201 id=201 data-nosnippet>201</a>    <span class="kw">let </span><span class="kw-2">mut </span>skipped_tests_count: usize = <span class="number">0</span>;
-<a href=#202 id=202 data-nosnippet>202</a>    <span class="kw">let </span><span class="kw-2">mut </span>unexpected_success_count: usize = <span class="number">0</span>;
-<a href=#203 id=203 data-nosnippet>203</a>    <span class="kw">let </span><span class="kw-2">mut </span>expected_fail_count: usize = <span class="number">0</span>;
-<a href=#204 id=204 data-nosnippet>204</a>
-<a href=#205 id=205 data-nosnippet>205</a>    <span class="kw">let </span>is_root = Uid::current().is_root();
-<a href=#206 id=206 data-nosnippet>206</a>
-<a href=#207 id=207 data-nosnippet>207</a>    <span class="kw">let </span>enabled_features: HashSet&lt;<span class="kw">_</span>&gt; = config.features.fs_features.keys().collect();
-<a href=#208 id=208 data-nosnippet>208</a>
-<a href=#209 id=209 data-nosnippet>209</a>    <span class="kw">let </span>entries = <span class="kw-2">&amp;</span>config.dummy_auth.entries;
-<a href=#210 id=210 data-nosnippet>210</a>
-<a href=#211 id=211 data-nosnippet>211</a>    <span class="kw">for </span>test_case <span class="kw">in </span>test_cases {
-<a href=#212 id=212 data-nosnippet>212</a>        <span class="comment">//TODO: There's probably a better way to do this...
-<a href=#213 id=213 data-nosnippet>213</a>        </span><span class="kw">let </span><span class="kw-2">mut </span>should_skip = test_case.require_root &amp;&amp; !is_root;
-<a href=#214 id=214 data-nosnippet>214</a>        <span class="kw">let </span><span class="kw-2">mut </span>skip_reasons = Vec::&lt;String&gt;::new();
-<a href=#215 id=215 data-nosnippet>215</a>
-<a href=#216 id=216 data-nosnippet>216</a>        <span class="kw">let </span>expect_fail = config.settings.expected_failures.contains(test_case.name);
-<a href=#217 id=217 data-nosnippet>217</a>        <span class="kw">if </span>should_skip {
-<a href=#218 id=218 data-nosnippet>218</a>            skip_reasons.push(String::from(<span class="string">"requires root privileges"</span>));
-<a href=#219 id=219 data-nosnippet>219</a>        }
-<a href=#220 id=220 data-nosnippet>220</a>
-<a href=#221 id=221 data-nosnippet>221</a>        <span class="kw">let </span>features: HashSet&lt;<span class="kw">_</span>&gt; = test_case.required_features.iter().collect();
-<a href=#222 id=222 data-nosnippet>222</a>        <span class="kw">let </span>missing_features: Vec&lt;<span class="kw">_</span>&gt; = features.difference(<span class="kw-2">&amp;</span>enabled_features).collect();
-<a href=#223 id=223 data-nosnippet>223</a>        <span class="kw">if </span>!missing_features.is_empty() {
-<a href=#224 id=224 data-nosnippet>224</a>            should_skip = <span class="bool-val">true</span>;
-<a href=#225 id=225 data-nosnippet>225</a>
-<a href=#226 id=226 data-nosnippet>226</a>            <span class="kw">let </span>features = <span class="kw-2">&amp;</span>missing_features
-<a href=#227 id=227 data-nosnippet>227</a>                .iter()
-<a href=#228 id=228 data-nosnippet>228</a>                .map(|feature| <span class="macro">format!</span>(<span class="string">"{}"</span>, feature))
-<a href=#229 id=229 data-nosnippet>229</a>                .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
-<a href=#230 id=230 data-nosnippet>230</a>                .join(<span class="string">", "</span>);
-<a href=#231 id=231 data-nosnippet>231</a>
-<a href=#232 id=232 data-nosnippet>232</a>            skip_reasons.push(<span class="macro">format!</span>(<span class="string">"requires features: {}"</span>, features));
-<a href=#233 id=233 data-nosnippet>233</a>        }
+<a href=#130 id=130 data-nosnippet>130</a>    <span class="kw">if let </span><span class="prelude-val">Some</span>(sfs) = args.secondary_fs {
+<a href=#131 id=131 data-nosnippet>131</a>        config.features.secondary_fs = <span class="prelude-val">Some</span>(sfs);
+<a href=#132 id=132 data-nosnippet>132</a>    }
+<a href=#133 id=133 data-nosnippet>133</a>
+<a href=#134 id=134 data-nosnippet>134</a>    <span class="kw">let </span>path = args
+<a href=#135 id=135 data-nosnippet>135</a>        .path
+<a href=#136 id=136 data-nosnippet>136</a>        .ok_or_else(|| <span class="macro">anyhow::anyhow!</span>(<span class="string">"cannot get current dir"</span>))
+<a href=#137 id=137 data-nosnippet>137</a>        .or_else(|<span class="kw">_</span>| current_dir())<span class="question-mark">?</span>;
+<a href=#138 id=138 data-nosnippet>138</a>    <span class="kw">let </span>base_dir = tempdir_in(path)<span class="question-mark">?</span>;
+<a href=#139 id=139 data-nosnippet>139</a>
+<a href=#140 id=140 data-nosnippet>140</a>    set_hook(Box::new(|<span class="kw">_</span>| {
+<a href=#141 id=141 data-nosnippet>141</a>        <span class="kw-2">*</span>BACKTRACE.lock().unwrap() = <span class="prelude-val">Some</span>(Backtrace::capture());
+<a href=#142 id=142 data-nosnippet>142</a>    }));
+<a href=#143 id=143 data-nosnippet>143</a>
+<a href=#144 id=144 data-nosnippet>144</a>    <span class="kw">let </span>test_cases = inventory::iter::&lt;TestCase&gt;;
+<a href=#145 id=145 data-nosnippet>145</a>    <span class="kw">let </span>test_cases: Vec&lt;<span class="kw">_</span>&gt; = test_cases
+<a href=#146 id=146 data-nosnippet>146</a>        .into_iter()
+<a href=#147 id=147 data-nosnippet>147</a>        .filter(|case| {
+<a href=#148 id=148 data-nosnippet>148</a>            args.test_patterns.is_empty()
+<a href=#149 id=149 data-nosnippet>149</a>                || args.test_patterns.iter().any(|pat| {
+<a href=#150 id=150 data-nosnippet>150</a>                    <span class="kw">if </span>args.exact {
+<a href=#151 id=151 data-nosnippet>151</a>                        case.name == pat
+<a href=#152 id=152 data-nosnippet>152</a>                    } <span class="kw">else </span>{
+<a href=#153 id=153 data-nosnippet>153</a>                        case.name.contains(pat)
+<a href=#154 id=154 data-nosnippet>154</a>                    }
+<a href=#155 id=155 data-nosnippet>155</a>                })
+<a href=#156 id=156 data-nosnippet>156</a>        })
+<a href=#157 id=157 data-nosnippet>157</a>        .map(|tc: <span class="kw-2">&amp;</span>TestCase| TestCase {
+<a href=#158 id=158 data-nosnippet>158</a>            <span class="comment">// Ideally trim_start_matches could be done in test_case!, but only
+<a href=#159 id=159 data-nosnippet>159</a>            // const functions are allowed there.
+<a href=#160 id=160 data-nosnippet>160</a>            </span>name: tc.name.trim_start_matches(<span class="string">"pjdfstest::tests::"</span>),
+<a href=#161 id=161 data-nosnippet>161</a>            description: tc.description,
+<a href=#162 id=162 data-nosnippet>162</a>            require_root: tc.require_root,
+<a href=#163 id=163 data-nosnippet>163</a>            fun: tc.fun,
+<a href=#164 id=164 data-nosnippet>164</a>            required_features: tc.required_features,
+<a href=#165 id=165 data-nosnippet>165</a>            guards: tc.guards,
+<a href=#166 id=166 data-nosnippet>166</a>        })
+<a href=#167 id=167 data-nosnippet>167</a>        .collect();
+<a href=#168 id=168 data-nosnippet>168</a>
+<a href=#169 id=169 data-nosnippet>169</a>    umask(Mode::empty());
+<a href=#170 id=170 data-nosnippet>170</a>
+<a href=#171 id=171 data-nosnippet>171</a>    <span class="kw">let </span>overall_result = run_test_cases(<span class="kw-2">&amp;</span>test_cases, args.verbose, <span class="kw-2">&amp;</span>config, base_dir)<span class="question-mark">?</span>;
+<a href=#172 id=172 data-nosnippet>172</a>
+<a href=#173 id=173 data-nosnippet>173</a>    <span class="macro">println!</span>(
+<a href=#174 id=174 data-nosnippet>174</a>        <span class="string">"\n{}: {} {}, {} {}, {} {}, {} {}, {} total"</span>,
+<a href=#175 id=175 data-nosnippet>175</a>        <span class="string">"Summary"</span>.color(overall_result.color()).bold(),
+<a href=#176 id=176 data-nosnippet>176</a>        (overall_result.fail + overall_result.unexpect_pass),
+<a href=#177 id=177 data-nosnippet>177</a>        <span class="string">"failed"</span>.red().bold(),
+<a href=#178 id=178 data-nosnippet>178</a>        overall_result.skip,
+<a href=#179 id=179 data-nosnippet>179</a>        <span class="string">"skipped"</span>.yellow().bold(),
+<a href=#180 id=180 data-nosnippet>180</a>        overall_result.pass,
+<a href=#181 id=181 data-nosnippet>181</a>        <span class="string">"passed"</span>.green().bold(),
+<a href=#182 id=182 data-nosnippet>182</a>        overall_result.expect_fail,
+<a href=#183 id=183 data-nosnippet>183</a>        <span class="string">"expected failures"</span>.bright_green().bold(),
+<a href=#184 id=184 data-nosnippet>184</a>        overall_result.total()
+<a href=#185 id=185 data-nosnippet>185</a>    );
+<a href=#186 id=186 data-nosnippet>186</a>
+<a href=#187 id=187 data-nosnippet>187</a>    <span class="kw">if </span>overall_result.pass() {
+<a href=#188 id=188 data-nosnippet>188</a>        <span class="prelude-val">Ok</span>(())
+<a href=#189 id=189 data-nosnippet>189</a>    } <span class="kw">else </span>{
+<a href=#190 id=190 data-nosnippet>190</a>        <span class="prelude-val">Err</span>(<span class="macro">anyhow::anyhow!</span>(<span class="string">"Some tests have failed"</span>))
+<a href=#191 id=191 data-nosnippet>191</a>    }
+<a href=#192 id=192 data-nosnippet>192</a>}
+<a href=#193 id=193 data-nosnippet>193</a>
+<a href=#194 id=194 data-nosnippet>194</a><span class="doccomment">/// Run provided test cases and filter according to features and flags availability.
+<a href=#195 id=195 data-nosnippet>195</a></span><span class="comment">//TODO: Refactor this function
+<a href=#196 id=196 data-nosnippet>196</a></span><span class="kw">fn </span>run_test_cases(
+<a href=#197 id=197 data-nosnippet>197</a>    test_cases: <span class="kw-2">&amp;</span>[TestCase],
+<a href=#198 id=198 data-nosnippet>198</a>    verbose: bool,
+<a href=#199 id=199 data-nosnippet>199</a>    config: <span class="kw-2">&amp;</span>Config,
+<a href=#200 id=200 data-nosnippet>200</a>    base_dir: TempDir,
+<a href=#201 id=201 data-nosnippet>201</a>) -&gt; <span class="prelude-ty">Result</span>&lt;OverallResult, anyhow::Error&gt; {
+<a href=#202 id=202 data-nosnippet>202</a>    <span class="kw">let </span><span class="kw-2">mut </span>failed_tests_count: usize = <span class="number">0</span>;
+<a href=#203 id=203 data-nosnippet>203</a>    <span class="kw">let </span><span class="kw-2">mut </span>succeeded_tests_count: usize = <span class="number">0</span>;
+<a href=#204 id=204 data-nosnippet>204</a>    <span class="kw">let </span><span class="kw-2">mut </span>skipped_tests_count: usize = <span class="number">0</span>;
+<a href=#205 id=205 data-nosnippet>205</a>    <span class="kw">let </span><span class="kw-2">mut </span>unexpected_success_count: usize = <span class="number">0</span>;
+<a href=#206 id=206 data-nosnippet>206</a>    <span class="kw">let </span><span class="kw-2">mut </span>expected_fail_count: usize = <span class="number">0</span>;
+<a href=#207 id=207 data-nosnippet>207</a>
+<a href=#208 id=208 data-nosnippet>208</a>    <span class="kw">let </span>is_root = Uid::current().is_root();
+<a href=#209 id=209 data-nosnippet>209</a>
+<a href=#210 id=210 data-nosnippet>210</a>    <span class="kw">let </span>enabled_features: HashSet&lt;<span class="kw">_</span>&gt; = config.features.fs_features.keys().collect();
+<a href=#211 id=211 data-nosnippet>211</a>
+<a href=#212 id=212 data-nosnippet>212</a>    <span class="kw">let </span>entries = <span class="kw-2">&amp;</span>config.dummy_auth.entries;
+<a href=#213 id=213 data-nosnippet>213</a>
+<a href=#214 id=214 data-nosnippet>214</a>    <span class="kw">for </span>test_case <span class="kw">in </span>test_cases {
+<a href=#215 id=215 data-nosnippet>215</a>        <span class="comment">//TODO: There's probably a better way to do this...
+<a href=#216 id=216 data-nosnippet>216</a>        </span><span class="kw">let </span><span class="kw-2">mut </span>should_skip = test_case.require_root &amp;&amp; !is_root;
+<a href=#217 id=217 data-nosnippet>217</a>        <span class="kw">let </span><span class="kw-2">mut </span>skip_reasons = Vec::&lt;String&gt;::new();
+<a href=#218 id=218 data-nosnippet>218</a>
+<a href=#219 id=219 data-nosnippet>219</a>        <span class="kw">let </span>expect_fail = config.settings.expected_failures.contains(test_case.name);
+<a href=#220 id=220 data-nosnippet>220</a>        <span class="kw">if </span>should_skip {
+<a href=#221 id=221 data-nosnippet>221</a>            skip_reasons.push(String::from(<span class="string">"requires root privileges"</span>));
+<a href=#222 id=222 data-nosnippet>222</a>        }
+<a href=#223 id=223 data-nosnippet>223</a>
+<a href=#224 id=224 data-nosnippet>224</a>        <span class="kw">let </span>features: HashSet&lt;<span class="kw">_</span>&gt; = test_case.required_features.iter().collect();
+<a href=#225 id=225 data-nosnippet>225</a>        <span class="kw">let </span>missing_features: Vec&lt;<span class="kw">_</span>&gt; = features.difference(<span class="kw-2">&amp;</span>enabled_features).collect();
+<a href=#226 id=226 data-nosnippet>226</a>        <span class="kw">if </span>!missing_features.is_empty() {
+<a href=#227 id=227 data-nosnippet>227</a>            should_skip = <span class="bool-val">true</span>;
+<a href=#228 id=228 data-nosnippet>228</a>
+<a href=#229 id=229 data-nosnippet>229</a>            <span class="kw">let </span>features = <span class="kw-2">&amp;</span>missing_features
+<a href=#230 id=230 data-nosnippet>230</a>                .iter()
+<a href=#231 id=231 data-nosnippet>231</a>                .map(|feature| <span class="macro">format!</span>(<span class="string">"{}"</span>, feature))
+<a href=#232 id=232 data-nosnippet>232</a>                .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+<a href=#233 id=233 data-nosnippet>233</a>                .join(<span class="string">", "</span>);
 <a href=#234 id=234 data-nosnippet>234</a>
-<a href=#235 id=235 data-nosnippet>235</a>        <span class="kw">let </span>temp_dir = tempdir_in(base_dir.path()).unwrap();
-<a href=#236 id=236 data-nosnippet>236</a>        <span class="comment">// FIX: some tests need a 0o755 base dir
-<a href=#237 id=237 data-nosnippet>237</a>        </span>chmod(temp_dir.path(), Mode::from_bits_truncate(<span class="number">0o755</span>)).unwrap();
-<a href=#238 id=238 data-nosnippet>238</a>
-<a href=#239 id=239 data-nosnippet>239</a>        <span class="kw">if </span>test_case
-<a href=#240 id=240 data-nosnippet>240</a>            .guards
-<a href=#241 id=241 data-nosnippet>241</a>            .iter()
-<a href=#242 id=242 data-nosnippet>242</a>            .any(|guard| guard(config, temp_dir.path()).is_err())
-<a href=#243 id=243 data-nosnippet>243</a>        {
-<a href=#244 id=244 data-nosnippet>244</a>            should_skip = <span class="bool-val">true</span>;
-<a href=#245 id=245 data-nosnippet>245</a>            skip_reasons.extend(
-<a href=#246 id=246 data-nosnippet>246</a>                test_case
-<a href=#247 id=247 data-nosnippet>247</a>                    .guards
-<a href=#248 id=248 data-nosnippet>248</a>                    .iter()
-<a href=#249 id=249 data-nosnippet>249</a>                    .filter_map(|guard| guard(config, base_dir.path()).err())
-<a href=#250 id=250 data-nosnippet>250</a>                    .map(|err| err.to_string()),
-<a href=#251 id=251 data-nosnippet>251</a>            );
-<a href=#252 id=252 data-nosnippet>252</a>        }
-<a href=#253 id=253 data-nosnippet>253</a>
-<a href=#254 id=254 data-nosnippet>254</a>        stdout().lock().flush()<span class="question-mark">?</span>;
-<a href=#255 id=255 data-nosnippet>255</a>
-<a href=#256 id=256 data-nosnippet>256</a>        <span class="kw">if </span>should_skip {
-<a href=#257 id=257 data-nosnippet>257</a>            <span class="macro">println!</span>(<span class="string">"{:72} {}"</span>, test_case.name.blue(), <span class="string">"skipped"</span>.yellow());
-<a href=#258 id=258 data-nosnippet>258</a>            <span class="kw">if </span>verbose &amp;&amp; !test_case.description.is_empty() {
-<a href=#259 id=259 data-nosnippet>259</a>                <span class="macro">println!</span>(<span class="string">"\t{}"</span>, test_case.description);
-<a href=#260 id=260 data-nosnippet>260</a>            }
-<a href=#261 id=261 data-nosnippet>261</a>            <span class="kw">for </span>reason <span class="kw">in </span><span class="kw-2">&amp;</span>skip_reasons {
-<a href=#262 id=262 data-nosnippet>262</a>                <span class="macro">println!</span>(<span class="string">"\t{}"</span>, reason.yellow());
+<a href=#235 id=235 data-nosnippet>235</a>            skip_reasons.push(<span class="macro">format!</span>(<span class="string">"requires features: {}"</span>, features));
+<a href=#236 id=236 data-nosnippet>236</a>        }
+<a href=#237 id=237 data-nosnippet>237</a>
+<a href=#238 id=238 data-nosnippet>238</a>        <span class="kw">let </span>temp_dir = tempdir_in(base_dir.path()).unwrap();
+<a href=#239 id=239 data-nosnippet>239</a>        <span class="comment">// FIX: some tests need a 0o755 base dir
+<a href=#240 id=240 data-nosnippet>240</a>        </span>chmod(temp_dir.path(), Mode::from_bits_truncate(<span class="number">0o755</span>)).unwrap();
+<a href=#241 id=241 data-nosnippet>241</a>
+<a href=#242 id=242 data-nosnippet>242</a>        <span class="kw">if </span>test_case
+<a href=#243 id=243 data-nosnippet>243</a>            .guards
+<a href=#244 id=244 data-nosnippet>244</a>            .iter()
+<a href=#245 id=245 data-nosnippet>245</a>            .any(|guard| guard(config, temp_dir.path()).is_err())
+<a href=#246 id=246 data-nosnippet>246</a>        {
+<a href=#247 id=247 data-nosnippet>247</a>            should_skip = <span class="bool-val">true</span>;
+<a href=#248 id=248 data-nosnippet>248</a>            skip_reasons.extend(
+<a href=#249 id=249 data-nosnippet>249</a>                test_case
+<a href=#250 id=250 data-nosnippet>250</a>                    .guards
+<a href=#251 id=251 data-nosnippet>251</a>                    .iter()
+<a href=#252 id=252 data-nosnippet>252</a>                    .filter_map(|guard| guard(config, base_dir.path()).err())
+<a href=#253 id=253 data-nosnippet>253</a>                    .map(|err| err.to_string()),
+<a href=#254 id=254 data-nosnippet>254</a>            );
+<a href=#255 id=255 data-nosnippet>255</a>        }
+<a href=#256 id=256 data-nosnippet>256</a>
+<a href=#257 id=257 data-nosnippet>257</a>        stdout().lock().flush()<span class="question-mark">?</span>;
+<a href=#258 id=258 data-nosnippet>258</a>
+<a href=#259 id=259 data-nosnippet>259</a>        <span class="kw">if </span>should_skip {
+<a href=#260 id=260 data-nosnippet>260</a>            <span class="macro">println!</span>(<span class="string">"{:72} {}"</span>, test_case.name.blue(), <span class="string">"skipped"</span>.yellow());
+<a href=#261 id=261 data-nosnippet>261</a>            <span class="kw">if </span>verbose &amp;&amp; !test_case.description.is_empty() {
+<a href=#262 id=262 data-nosnippet>262</a>                <span class="macro">println!</span>(<span class="string">"\t{}"</span>, test_case.description);
 <a href=#263 id=263 data-nosnippet>263</a>            }
-<a href=#264 id=264 data-nosnippet>264</a>            skipped_tests_count += <span class="number">1</span>;
-<a href=#265 id=265 data-nosnippet>265</a>            <span class="kw">continue</span>;
-<a href=#266 id=266 data-nosnippet>266</a>        }
-<a href=#267 id=267 data-nosnippet>267</a>
-<a href=#268 id=268 data-nosnippet>268</a>        <span class="kw">let </span>result = catch_unwind(|| <span class="kw">match </span>test_case.fun {
-<a href=#269 id=269 data-nosnippet>269</a>            TestFn::NonSerialized(fun) =&gt; {
-<a href=#270 id=270 data-nosnippet>270</a>                <span class="kw">let </span><span class="kw-2">mut </span>context = TestContext::new(config, entries, temp_dir.path());
-<a href=#271 id=271 data-nosnippet>271</a>
-<a href=#272 id=272 data-nosnippet>272</a>                (fun)(<span class="kw-2">&amp;mut </span>context)
-<a href=#273 id=273 data-nosnippet>273</a>            }
-<a href=#274 id=274 data-nosnippet>274</a>            TestFn::Serialized(fun) =&gt; {
-<a href=#275 id=275 data-nosnippet>275</a>                <span class="kw">let </span><span class="kw-2">mut </span>context = SerializedTestContext::new(config, entries, temp_dir.path());
-<a href=#276 id=276 data-nosnippet>276</a>
-<a href=#277 id=277 data-nosnippet>277</a>                (fun)(<span class="kw-2">&amp;mut </span>context)
-<a href=#278 id=278 data-nosnippet>278</a>            }
-<a href=#279 id=279 data-nosnippet>279</a>        });
-<a href=#280 id=280 data-nosnippet>280</a>
-<a href=#281 id=281 data-nosnippet>281</a>        <span class="kw">let </span>error_info = <span class="kw">match </span>result {
-<a href=#282 id=282 data-nosnippet>282</a>            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="kw">if </span>!expect_fail =&gt; {
-<a href=#283 id=283 data-nosnippet>283</a>                <span class="macro">println!</span>(<span class="string">"{:77} {}"</span>, test_case.name.blue(), <span class="string">"ok"</span>.green());
-<a href=#284 id=284 data-nosnippet>284</a>                succeeded_tests_count += <span class="number">1</span>;
-<a href=#285 id=285 data-nosnippet>285</a>                <span class="prelude-val">None
-<a href=#286 id=286 data-nosnippet>286</a>            </span>}
-<a href=#287 id=287 data-nosnippet>287</a>            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-<a href=#288 id=288 data-nosnippet>288</a>                <span class="macro">println!</span>(
-<a href=#289 id=289 data-nosnippet>289</a>                    <span class="string">"{:60} {}"</span>,
-<a href=#290 id=290 data-nosnippet>290</a>                    test_case.name.blue(),
-<a href=#291 id=291 data-nosnippet>291</a>                    <span class="string">"PASSED UNEXPECTEDLY"</span>.red()
-<a href=#292 id=292 data-nosnippet>292</a>                );
-<a href=#293 id=293 data-nosnippet>293</a>                unexpected_success_count += <span class="number">1</span>;
-<a href=#294 id=294 data-nosnippet>294</a>                <span class="prelude-val">None
-<a href=#295 id=295 data-nosnippet>295</a>            </span>}
-<a href=#296 id=296 data-nosnippet>296</a>            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="kw">if </span>expect_fail =&gt; {
-<a href=#297 id=297 data-nosnippet>297</a>                <span class="macro">println!</span>(
-<a href=#298 id=298 data-nosnippet>298</a>                    <span class="string">"{:61} {}"</span>,
-<a href=#299 id=299 data-nosnippet>299</a>                    test_case.name.blue(),
-<a href=#300 id=300 data-nosnippet>300</a>                    <span class="string">"failed as expected"</span>.green()
-<a href=#301 id=301 data-nosnippet>301</a>                );
-<a href=#302 id=302 data-nosnippet>302</a>                expected_fail_count += <span class="number">1</span>;
-<a href=#303 id=303 data-nosnippet>303</a>                <span class="prelude-val">None
-<a href=#304 id=304 data-nosnippet>304</a>            </span>}
-<a href=#305 id=305 data-nosnippet>305</a>            <span class="prelude-val">Err</span>(e) =&gt; {
-<a href=#306 id=306 data-nosnippet>306</a>                <span class="kw">let </span>backtrace = BACKTRACE
-<a href=#307 id=307 data-nosnippet>307</a>                    .lock()
-<a href=#308 id=308 data-nosnippet>308</a>                    .unwrap()
-<a href=#309 id=309 data-nosnippet>309</a>                    .take()
-<a href=#310 id=310 data-nosnippet>310</a>                    .filter(|bt| bt.status() == BacktraceStatus::Captured);
-<a href=#311 id=311 data-nosnippet>311</a>                <span class="kw">let </span>panic_information = <span class="kw">match </span>e.downcast::&lt;String&gt;() {
-<a href=#312 id=312 data-nosnippet>312</a>                    <span class="prelude-val">Ok</span>(v) =&gt; <span class="kw-2">*</span>v,
-<a href=#313 id=313 data-nosnippet>313</a>                    <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">match </span>e.downcast::&lt;<span class="kw-2">&amp;</span>str&gt;() {
-<a href=#314 id=314 data-nosnippet>314</a>                        <span class="prelude-val">Ok</span>(v) =&gt; v.to_string(),
-<a href=#315 id=315 data-nosnippet>315</a>                        <span class="kw">_ </span>=&gt; <span class="string">"Unknown Source of Error"</span>.to_owned(),
-<a href=#316 id=316 data-nosnippet>316</a>                    },
-<a href=#317 id=317 data-nosnippet>317</a>                };
-<a href=#318 id=318 data-nosnippet>318</a>                <span class="macro">println!</span>(<span class="string">"{:73} {}"</span>, test_case.name.blue(), <span class="string">"FAILED"</span>.red());
-<a href=#319 id=319 data-nosnippet>319</a>                failed_tests_count += <span class="number">1</span>;
-<a href=#320 id=320 data-nosnippet>320</a>                <span class="prelude-val">Some</span>((panic_information, backtrace))
-<a href=#321 id=321 data-nosnippet>321</a>            }
-<a href=#322 id=322 data-nosnippet>322</a>        };
-<a href=#323 id=323 data-nosnippet>323</a>        <span class="kw">if </span>verbose &amp;&amp; !test_case.description.is_empty() {
-<a href=#324 id=324 data-nosnippet>324</a>            <span class="macro">println!</span>(<span class="string">"\t{}"</span>, test_case.description);
-<a href=#325 id=325 data-nosnippet>325</a>        }
-<a href=#326 id=326 data-nosnippet>326</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>((panic_information, backtrace)) = error_info {
-<a href=#327 id=327 data-nosnippet>327</a>            <span class="macro">println!</span>(<span class="string">"\t{}"</span>, panic_information);
-<a href=#328 id=328 data-nosnippet>328</a>            <span class="kw">if let </span><span class="prelude-val">Some</span>(backtrace) = backtrace {
-<a href=#329 id=329 data-nosnippet>329</a>                <span class="macro">println!</span>(<span class="string">"Backtrace:\n{}"</span>, backtrace);
-<a href=#330 id=330 data-nosnippet>330</a>            }
-<a href=#331 id=331 data-nosnippet>331</a>        }
-<a href=#332 id=332 data-nosnippet>332</a>
-<a href=#333 id=333 data-nosnippet>333</a>        <span class="kw">if </span>verbose &amp;&amp; !test_case.description.is_empty() {
-<a href=#334 id=334 data-nosnippet>334</a>            <span class="macro">println!</span>(<span class="string">"\t{}"</span>, test_case.description);
-<a href=#335 id=335 data-nosnippet>335</a>        }
-<a href=#336 id=336 data-nosnippet>336</a>    }
-<a href=#337 id=337 data-nosnippet>337</a>
-<a href=#338 id=338 data-nosnippet>338</a>    <span class="prelude-val">Ok</span>(OverallResult {
-<a href=#339 id=339 data-nosnippet>339</a>        fail: failed_tests_count,
-<a href=#340 id=340 data-nosnippet>340</a>        skip: skipped_tests_count,
-<a href=#341 id=341 data-nosnippet>341</a>        pass: succeeded_tests_count,
-<a href=#342 id=342 data-nosnippet>342</a>        unexpect_pass: unexpected_success_count,
-<a href=#343 id=343 data-nosnippet>343</a>        expect_fail: expected_fail_count,
-<a href=#344 id=344 data-nosnippet>344</a>    })
-<a href=#345 id=345 data-nosnippet>345</a>}
+<a href=#264 id=264 data-nosnippet>264</a>            <span class="kw">for </span>reason <span class="kw">in </span><span class="kw-2">&amp;</span>skip_reasons {
+<a href=#265 id=265 data-nosnippet>265</a>                <span class="macro">println!</span>(<span class="string">"\t{}"</span>, reason.yellow());
+<a href=#266 id=266 data-nosnippet>266</a>            }
+<a href=#267 id=267 data-nosnippet>267</a>            skipped_tests_count += <span class="number">1</span>;
+<a href=#268 id=268 data-nosnippet>268</a>            <span class="kw">continue</span>;
+<a href=#269 id=269 data-nosnippet>269</a>        }
+<a href=#270 id=270 data-nosnippet>270</a>
+<a href=#271 id=271 data-nosnippet>271</a>        <span class="kw">let </span>result = catch_unwind(|| <span class="kw">match </span>test_case.fun {
+<a href=#272 id=272 data-nosnippet>272</a>            TestFn::NonSerialized(fun) =&gt; {
+<a href=#273 id=273 data-nosnippet>273</a>                <span class="kw">let </span><span class="kw-2">mut </span>context = TestContext::new(config, entries, temp_dir.path());
+<a href=#274 id=274 data-nosnippet>274</a>
+<a href=#275 id=275 data-nosnippet>275</a>                (fun)(<span class="kw-2">&amp;mut </span>context)
+<a href=#276 id=276 data-nosnippet>276</a>            }
+<a href=#277 id=277 data-nosnippet>277</a>            TestFn::Serialized(fun) =&gt; {
+<a href=#278 id=278 data-nosnippet>278</a>                <span class="kw">let </span><span class="kw-2">mut </span>context = SerializedTestContext::new(config, entries, temp_dir.path());
+<a href=#279 id=279 data-nosnippet>279</a>
+<a href=#280 id=280 data-nosnippet>280</a>                (fun)(<span class="kw-2">&amp;mut </span>context)
+<a href=#281 id=281 data-nosnippet>281</a>            }
+<a href=#282 id=282 data-nosnippet>282</a>        });
+<a href=#283 id=283 data-nosnippet>283</a>
+<a href=#284 id=284 data-nosnippet>284</a>        <span class="kw">let </span>error_info = <span class="kw">match </span>result {
+<a href=#285 id=285 data-nosnippet>285</a>            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="kw">if </span>!expect_fail =&gt; {
+<a href=#286 id=286 data-nosnippet>286</a>                <span class="macro">println!</span>(<span class="string">"{:77} {}"</span>, test_case.name.blue(), <span class="string">"ok"</span>.green());
+<a href=#287 id=287 data-nosnippet>287</a>                succeeded_tests_count += <span class="number">1</span>;
+<a href=#288 id=288 data-nosnippet>288</a>                <span class="prelude-val">None
+<a href=#289 id=289 data-nosnippet>289</a>            </span>}
+<a href=#290 id=290 data-nosnippet>290</a>            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+<a href=#291 id=291 data-nosnippet>291</a>                <span class="macro">println!</span>(
+<a href=#292 id=292 data-nosnippet>292</a>                    <span class="string">"{:60} {}"</span>,
+<a href=#293 id=293 data-nosnippet>293</a>                    test_case.name.blue(),
+<a href=#294 id=294 data-nosnippet>294</a>                    <span class="string">"PASSED UNEXPECTEDLY"</span>.red()
+<a href=#295 id=295 data-nosnippet>295</a>                );
+<a href=#296 id=296 data-nosnippet>296</a>                unexpected_success_count += <span class="number">1</span>;
+<a href=#297 id=297 data-nosnippet>297</a>                <span class="prelude-val">None
+<a href=#298 id=298 data-nosnippet>298</a>            </span>}
+<a href=#299 id=299 data-nosnippet>299</a>            <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="kw">if </span>expect_fail =&gt; {
+<a href=#300 id=300 data-nosnippet>300</a>                <span class="macro">println!</span>(
+<a href=#301 id=301 data-nosnippet>301</a>                    <span class="string">"{:61} {}"</span>,
+<a href=#302 id=302 data-nosnippet>302</a>                    test_case.name.blue(),
+<a href=#303 id=303 data-nosnippet>303</a>                    <span class="string">"failed as expected"</span>.green()
+<a href=#304 id=304 data-nosnippet>304</a>                );
+<a href=#305 id=305 data-nosnippet>305</a>                expected_fail_count += <span class="number">1</span>;
+<a href=#306 id=306 data-nosnippet>306</a>                <span class="prelude-val">None
+<a href=#307 id=307 data-nosnippet>307</a>            </span>}
+<a href=#308 id=308 data-nosnippet>308</a>            <span class="prelude-val">Err</span>(e) =&gt; {
+<a href=#309 id=309 data-nosnippet>309</a>                <span class="kw">let </span>backtrace = BACKTRACE
+<a href=#310 id=310 data-nosnippet>310</a>                    .lock()
+<a href=#311 id=311 data-nosnippet>311</a>                    .unwrap()
+<a href=#312 id=312 data-nosnippet>312</a>                    .take()
+<a href=#313 id=313 data-nosnippet>313</a>                    .filter(|bt| bt.status() == BacktraceStatus::Captured);
+<a href=#314 id=314 data-nosnippet>314</a>                <span class="kw">let </span>panic_information = <span class="kw">match </span>e.downcast::&lt;String&gt;() {
+<a href=#315 id=315 data-nosnippet>315</a>                    <span class="prelude-val">Ok</span>(v) =&gt; <span class="kw-2">*</span>v,
+<a href=#316 id=316 data-nosnippet>316</a>                    <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">match </span>e.downcast::&lt;<span class="kw-2">&amp;</span>str&gt;() {
+<a href=#317 id=317 data-nosnippet>317</a>                        <span class="prelude-val">Ok</span>(v) =&gt; v.to_string(),
+<a href=#318 id=318 data-nosnippet>318</a>                        <span class="kw">_ </span>=&gt; <span class="string">"Unknown Source of Error"</span>.to_owned(),
+<a href=#319 id=319 data-nosnippet>319</a>                    },
+<a href=#320 id=320 data-nosnippet>320</a>                };
+<a href=#321 id=321 data-nosnippet>321</a>                <span class="macro">println!</span>(<span class="string">"{:73} {}"</span>, test_case.name.blue(), <span class="string">"FAILED"</span>.red());
+<a href=#322 id=322 data-nosnippet>322</a>                failed_tests_count += <span class="number">1</span>;
+<a href=#323 id=323 data-nosnippet>323</a>                <span class="prelude-val">Some</span>((panic_information, backtrace))
+<a href=#324 id=324 data-nosnippet>324</a>            }
+<a href=#325 id=325 data-nosnippet>325</a>        };
+<a href=#326 id=326 data-nosnippet>326</a>        <span class="kw">if </span>verbose &amp;&amp; !test_case.description.is_empty() {
+<a href=#327 id=327 data-nosnippet>327</a>            <span class="macro">println!</span>(<span class="string">"\t{}"</span>, test_case.description);
+<a href=#328 id=328 data-nosnippet>328</a>        }
+<a href=#329 id=329 data-nosnippet>329</a>        <span class="kw">if let </span><span class="prelude-val">Some</span>((panic_information, backtrace)) = error_info {
+<a href=#330 id=330 data-nosnippet>330</a>            <span class="macro">println!</span>(<span class="string">"\t{}"</span>, panic_information);
+<a href=#331 id=331 data-nosnippet>331</a>            <span class="kw">if let </span><span class="prelude-val">Some</span>(backtrace) = backtrace {
+<a href=#332 id=332 data-nosnippet>332</a>                <span class="macro">println!</span>(<span class="string">"Backtrace:\n{}"</span>, backtrace);
+<a href=#333 id=333 data-nosnippet>333</a>            }
+<a href=#334 id=334 data-nosnippet>334</a>        }
+<a href=#335 id=335 data-nosnippet>335</a>
+<a href=#336 id=336 data-nosnippet>336</a>        <span class="kw">if </span>verbose &amp;&amp; !test_case.description.is_empty() {
+<a href=#337 id=337 data-nosnippet>337</a>            <span class="macro">println!</span>(<span class="string">"\t{}"</span>, test_case.description);
+<a href=#338 id=338 data-nosnippet>338</a>        }
+<a href=#339 id=339 data-nosnippet>339</a>    }
+<a href=#340 id=340 data-nosnippet>340</a>
+<a href=#341 id=341 data-nosnippet>341</a>    <span class="prelude-val">Ok</span>(OverallResult {
+<a href=#342 id=342 data-nosnippet>342</a>        fail: failed_tests_count,
+<a href=#343 id=343 data-nosnippet>343</a>        skip: skipped_tests_count,
+<a href=#344 id=344 data-nosnippet>344</a>        pass: succeeded_tests_count,
+<a href=#345 id=345 data-nosnippet>345</a>        unexpect_pass: unexpected_success_count,
+<a href=#346 id=346 data-nosnippet>346</a>        expect_fail: expected_fail_count,
+<a href=#347 id=347 data-nosnippet>347</a>    })
+<a href=#348 id=348 data-nosnippet>348</a>}
 </code></pre></div></section></main></body></html>
