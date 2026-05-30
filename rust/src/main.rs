@@ -122,11 +122,14 @@ fn main() -> anyhow::Result<()> {
         return Ok(());
     }
 
-    let config = args
+    let mut config = args
         .configuration_file
         .as_ref()
         .map(Config::load)
         .unwrap_or_default();
+    if let Some(sfs) = args.secondary_fs {
+        config.features.secondary_fs = Some(sfs);
+    }
 
     let path = args
         .path
