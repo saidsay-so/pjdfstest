@@ -7,7 +7,7 @@ repository = "https://github.com/saidsay-so/pjdfstest"
 categories = ["filesystem", "development-tools::testing"]
 rust-version = "1.85.0"
 keywords = ["filesystem", "test"]
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 license = "BSD-2-Clause"
 
