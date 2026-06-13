@@ -59,6 +59,13 @@ jobs:
           df -T /tmp
           target/release/pjdfstest -c $CFG -p /tmp
           su -m nobody -c "target/release/pjdfstest -c $CFG -p /tmp"
+      - name: 32-bit build
+        shell: freebsd {0}
+        run: |
+          . $HOME/.cargo/env
+          rustup target install i686-unknown-freebsd
+          cd rust
+          cargo check --target i686-unknown-freebsd
 
   linux:
     name: Linux
@@ -95,6 +102,12 @@ jobs:
           df -T /tmp
           target/release/pjdfstest -- -c $CFG -p /tmp
           sudo target/release/pjdfstest -- -c $CFG -p /tmp
+      - name: 32-bit build
+        working-directory: rust
+        run: |
+          . $HOME/.cargo/env
+          rustup target install i686-unknown-linux-gnu
+          cargo check --target i686-unknown-linux-gnu
 
   lint:
     runs-on: ubuntu-latest

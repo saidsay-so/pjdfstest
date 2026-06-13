@@ -339,6 +339,7 @@ dependencies = [
  "exacl",
  "inventory",
  "jail",
+ "libc",
  "nix",
  "pastey",
  "rand",

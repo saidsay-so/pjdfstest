@@ -114,7 +114,7 @@ fn interact_2gb(ctx: &mut TestContext) {
     let (path, fd) = ctx.create_file(OFlag::O_WRONLY, Some(0o755)).unwrap();
     const DATA: &str = "data";
     const GB: usize = 1024usize.pow(3);
-    let offset = 2 * GB as i64 + 1;
+    let offset = 2 * GB as libc::off_t + 1;
     pwrite(&fd, DATA.as_bytes(), offset).unwrap();
     let expected_size = offset as u64 + DATA.len() as u64;
     let size = symlink_metadata(&path).unwrap().size();
