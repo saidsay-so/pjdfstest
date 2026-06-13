@@ -74,19 +74,31 @@ trait MetadataExt: StdMetadataExt {
     /// Return the file's last accessed time as a `TimeSpec`, including
     /// fractional component.
     fn atime_ts(&self) -> TimeSpec {
-        TimeSpec::new(self.atime(), self.atime_nsec())
+        TimeSpec::new(
+            libc::time_t::try_from(self.atime()).expect("non-Y2039-compliant platform"),
+            libc::c_long::try_from(self.atime_nsec())
+                .expect("std MetadataExt::atime_nsec() returned out of range value"),
+        )
     }
 
     /// Return the file's last changed time as a `TimeSpec`, including
     /// fractional component.
     fn ctime_ts(&self) -> TimeSpec {
-        TimeSpec::new(self.ctime(), self.ctime_nsec())
+        TimeSpec::new(
+            libc::time_t::try_from(self.ctime()).expect("non-Y2039-compliant platform"),
+            libc::c_long::try_from(self.ctime_nsec())
+                .expect("std MetadataExt::ctime_nsec() returned out of range value"),
+        )
     }
 
     /// Return the file's last modified time as a `TimeSpec`, including
     /// fractional component.
     fn mtime_ts(&self) -> TimeSpec {
-        TimeSpec::new(self.mtime(), self.mtime_nsec())
+        TimeSpec::new(
+            libc::time_t::try_from(self.mtime()).expect("non-Y2039-compliant platform"),
+            libc::c_long::try_from(self.mtime_nsec())
+                .expect("std MetadataExt::mtime_nsec() returned out of range value"),
+        )
     }
 }
 

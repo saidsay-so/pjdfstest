@@ -161,7 +161,7 @@ fn unchanged_ctime_fails(ctx: &mut SerializedTestContext, ft: FileType) {
 // link/01.t
 enotdir_comp_either_test_case!(link);
 
-const LINK_MAX_LIMIT: i64 = 65535;
+const LINK_MAX_LIMIT: libc::c_long = 65535;
 
 // BUG: Some systems return bogus value, and testing directories
 // might give different result than trying directly on the file
