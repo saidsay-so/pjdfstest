@@ -1,3 +1,12 @@
+## [Unreleased] - ReleaseDate
+
+### Added
+
+- Added support for toolchains as old as Rust 1.74.0.  Users will need to
+  downgrade several dependencies in order to make that work.  They can copy
+  Cargo.lock.msrv to downgrade them all.
+  ([#186](https://github.com/saidsay-so/pjdfstest/pull/186))
+
 ## [0.2.2] - 2026-06-16
 
 ### Fixed

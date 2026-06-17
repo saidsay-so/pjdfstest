@@ -13,6 +13,8 @@ jobs:
         include:
           - freebsd_version: "15.0"
             rust_version: "stable"
+          - freebsd_version: "15.0"
+            rust_version: "1.74.1"
     name: FreeBSD ${{ matrix.freebsd_version }} Rust ${{ matrix.rust_version }}
     env:
       CFG: ci/freebsd-zfs.toml
@@ -37,6 +39,11 @@ jobs:
           cat <<EOF | adduser -w none -S -f -
           pjdfstest::::::Dummy User for pjdfstest:/nonexistent:/sbin/nologin:
           EOF
+      - name: Cargo.lock
+        if: ${{ matrix.rust_version == '1.74.1' }}
+        shell: freebsd {0}
+        run: |
+          cp rust/Cargo.lock.msrv rust/Cargo.lock
       - name: Build
         shell: freebsd {0}
         run: |
