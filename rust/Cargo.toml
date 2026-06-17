@@ -5,14 +5,14 @@ authors = ["Sayafdine Said <sayafdine.said@outlook.fr>", "Alan Somers <asomers@g
 documentation = "https://saidsay-so.github.io/pjdfstest/"
 repository = "https://github.com/saidsay-so/pjdfstest"
 categories = ["filesystem", "development-tools::testing"]
-rust-version = "1.85.0"
+rust-version = "1.74.0"
 keywords = ["filesystem", "test"]
 version = "0.2.2"
 edition = "2021"
 license = "BSD-2-Clause"
 
 [dependencies]
-colored = "3"
+colored = ">=2.2.0,<4"
 exacl = "0.12.0"
 tempfile = "3.14.0"
 rand = { version = "0.8.6", features = ["min_const_gen"] }
@@ -30,7 +30,7 @@ sysctl = "0.6.0"
 toml = { version = "0.8.11", default-features = false, features = [ "parse" ] }
 
 [target.'cfg(target_os = "freebsd")'.dependencies]
-jail = "0.3.1"
+jail = ">=0.2.0,<0.4.0"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 caps = "0.5.4"

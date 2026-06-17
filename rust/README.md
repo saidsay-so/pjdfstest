@@ -131,3 +131,8 @@ EOF
 Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on the process for submitting pull requests to us
 and the process for adding new tests.
 Also, read the [documentation](https://saidsay-so.github.io/pjdfstest/test-declaration.html) on how to declare tests.
+
+# Minimum Supported Rust Version (MSRV)
+
+pjdfstest is supported on Rust 1.74.1 and higher.  Its MSRV will not be
+changed in the future without bumping the major or minor version.
