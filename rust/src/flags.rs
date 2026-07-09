@@ -35,7 +35,6 @@ flags! {
     PartialEq,
     Eq,
     Hash,
-    strum::EnumString,
     strum::Display,
     strum::EnumIter,
     Serialize,
