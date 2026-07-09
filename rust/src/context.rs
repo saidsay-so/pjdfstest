@@ -14,7 +14,7 @@ use nix::{
     },
 };
 
-use rand::distributions::{Alphanumeric, DistString};
+use rand::distr::{Alphanumeric, SampleString};
 use std::{
     cell::Cell,
     fs::create_dir_all,
@@ -258,7 +258,7 @@ impl<'a> TestContext<'a> {
     /// Generate a random path.
     pub fn gen_path(&self) -> PathBuf {
         self.base_path()
-            .join(Alphanumeric.sample_string(&mut rand::thread_rng(), NUM_RAND_CHARS))
+            .join(Alphanumeric.sample_string(&mut rand::rng(), NUM_RAND_CHARS))
     }
 
     /// Create a regular file and open it.
@@ -291,7 +291,7 @@ impl<'a> TestContext<'a> {
 
         let file = self
             .new_file(f_type)
-            .name(Alphanumeric.sample_string(&mut rand::thread_rng(), max_name_len));
+            .name(Alphanumeric.sample_string(&mut rand::rng(), max_name_len));
 
         file.create()
     }
@@ -311,7 +311,7 @@ impl<'a> TestContext<'a> {
         let remaining_chars = max_path_len - initial_path_len;
 
         let parts: Vec<_> = (0..remaining_chars / component_len)
-            .map(|_| Alphanumeric.sample_string(&mut rand::thread_rng(), component_len - 1))
+            .map(|_| Alphanumeric.sample_string(&mut rand::rng(), component_len - 1))
             .collect();
 
         let remaining_chars = remaining_chars % component_len - 1;
@@ -320,7 +320,7 @@ impl<'a> TestContext<'a> {
 
             create_dir_all(&path).unwrap();
 
-            path.push(Alphanumeric.sample_string(&mut rand::thread_rng(), remaining_chars));
+            path.push(Alphanumeric.sample_string(&mut rand::rng(), remaining_chars));
         } else {
             path.extend(&parts[..parts.len() - 1]);
 
@@ -431,7 +431,7 @@ impl FileBuilder {
     fn final_path(&mut self) -> PathBuf {
         if self.random_name {
             self.path
-                .push(Alphanumeric.sample_string(&mut rand::thread_rng(), NUM_RAND_CHARS))
+                .push(Alphanumeric.sample_string(&mut rand::rng(), NUM_RAND_CHARS))
         }
 
         std::mem::take(&mut self.path)
