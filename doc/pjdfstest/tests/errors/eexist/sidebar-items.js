@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":["eexist_file_exists_test_case"]};
+window.SIDEBAR_ITEMS = {"macro":[["eexist_file_exists_test_case",1]]};

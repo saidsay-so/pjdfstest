@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":["efault_either_test_case","efault_path_test_case"]};
+window.SIDEBAR_ITEMS = {"macro":[["efault_either_test_case",1],["efault_path_test_case",1]]};

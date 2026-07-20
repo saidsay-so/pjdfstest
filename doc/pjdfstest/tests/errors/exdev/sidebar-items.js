@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["secondary_fs_available"],"macro":["exdev_target_test_case"]};
+window.SIDEBAR_ITEMS = {"fn":["secondary_fs_available"],"macro":[["exdev_target_test_case",1]]};

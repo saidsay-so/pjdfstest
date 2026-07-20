@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":["enametoolong_comp_test_case","enametoolong_either_comp_test_case","enametoolong_either_path_test_case","enametoolong_path_test_case"]};
+window.SIDEBAR_ITEMS = {"macro":[["enametoolong_comp_test_case",1],["enametoolong_either_comp_test_case",1],["enametoolong_either_path_test_case",1],["enametoolong_path_test_case",1]]};

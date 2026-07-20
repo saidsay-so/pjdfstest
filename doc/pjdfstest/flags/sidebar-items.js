@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["FileFlags"],"macro":["flags"],"struct":["FileFlagsIter"]};
+window.SIDEBAR_ITEMS = {"enum":["FileFlags"],"macro":[["flags",1]],"struct":["FileFlagsIter"]};
