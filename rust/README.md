@@ -16,6 +16,13 @@ cargo build --release
 
 - Rust (1.85.0 or later)
 
+#### LTO/abort
+
+Enabling LTO also sets panic=abort, which breaks the test suite.
+pjdfstest relies on generating panics and then unwinding them,
+which stops working when panicking doesn't unwind the stack.
+This also is the case when `panic` is set to `abort`. 
+
 #### FreeBSD
 
 Beyond the Rust toolchain, no extra packages are required to build.
