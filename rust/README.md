@@ -21,6 +21,7 @@ cargo build --release
 Enabling LTO also sets panic=abort, which breaks the test suite.
 pjdfstest relies on generating panics and then unwinding them,
 which stops working when panicking doesn't unwind the stack.
+This also is the case when `panic` is set to `abort`. 
 
 #### FreeBSD
 
